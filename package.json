@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "preinstall": "npx use-yarn",
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
@@ -16,6 +17,7 @@
     "@types/node": "^13.13.4",
     "@types/react": "^16.9.34",
     "dotenv-webpack": "^1.7.0",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "use-yarn": "^2.2.0"
   }
 }
