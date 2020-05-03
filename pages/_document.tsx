@@ -4,10 +4,7 @@ class Document extends NextDocument {
   render() {
     return (
       <Html>
-        <Head>
-          <title>Spotify Mixer</title>
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
+        <Head />
         <body>
           <Main />
           <NextScript />
