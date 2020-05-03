@@ -6,7 +6,7 @@ const clientId = process.env.SPOTIFY_CLIENT_ID;
 
 export const REDIRECT_URI = baseUrl + routes.mixer;
 
-export const END_POINTS = {
+export const SPOTIFY_END_POINTS = {
   authorizeSpotifyScope: (scope: string) => 'https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
@@ -14,4 +14,9 @@ export const END_POINTS = {
       redirect_uri: REDIRECT_URI,
       scope,
     }),
+  getToken: () => 'https://accounts.spotify.com/api/token',
+};
+
+export const END_POINTS = {
+  getToken: () => '/api/token',
 };

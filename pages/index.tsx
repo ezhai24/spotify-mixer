@@ -1,16 +1,16 @@
 import React from 'react';
-import { END_POINTS } from '~/shared/endpoints';
+import { SPOTIFY_END_POINTS } from '~/shared/endpoints';
 
 const Home = () => {
   const authorizePrimaryUser = () => {
     const scope = 'user-top-read playlist-modify-public';
-    const redirectUrl = END_POINTS.authorizeSpotifyScope(scope);
+    const redirectUrl = SPOTIFY_END_POINTS.authorizeSpotifyScope(scope);
     window.location.href = redirectUrl;
   };
 
   const authorizeSecondaryUser = () => {
     const scope = 'user-top-read';
-    const redirectUrl = END_POINTS.authorizeSpotifyScope(scope);
+    const redirectUrl = SPOTIFY_END_POINTS.authorizeSpotifyScope(scope);
     window.location.href = redirectUrl;
   };
 
