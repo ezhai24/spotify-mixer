@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 
+import { MixerControls, JoinConfirmation } from '~/components';
+
 import { END_POINTS, SPOTIFY_STATE_KEY } from '~/shared/endpoints';
+import { User } from '~/shared/types';
 
 const Mixer = () => {
-  const [spotifyAuth, setSpotifyAuth] = useState();
-  const [authError, setAuthError] = useState('');
+  const [user, setUser] = useState<User>();
+  const [authError, setAuthError] = useState<string>();
   
-  const getToken = async (code) => {
+  const getToken = async (code, isPrimaryUser) => {
     const tokenEndpoint = END_POINTS.getToken();
     const response = await fetch(tokenEndpoint, {
       method: 'POST',
       body: JSON.stringify({ code }),
     });
     const auth = await response.json();
-    setSpotifyAuth(auth);
+    setUser({ ...auth, isPrimaryUser });
 
     window.history.replaceState({}, document.title, '/mixer');
   };
@@ -27,15 +30,29 @@ const Mixer = () => {
     const code = urlParams.get('code');
 
     if (state === storedState && code) {
-      getToken(code);
+      const stateSuffix = state.slice(-1);
+      const isPrimaryUser = stateSuffix === 'P';
+      getToken(code, isPrimaryUser);
     } else {
       setAuthError('Something went wrong. Please try again later.');
     }
   }, []);
 
+  if (authError) {
+    return authError;
+  }
+
+  if (!user) {
+    return 'Loading...';
+  }
+
   return (
     <>
-      Mixer page!
+      { user.isPrimaryUser ?
+        <MixerControls />
+        :
+        <JoinConfirmation />
+      }
     </>
   );
 };
