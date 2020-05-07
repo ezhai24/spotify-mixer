@@ -17,7 +17,7 @@ if (!firebase.apps.length) {
   firebase.initializeApp(config);
 }
 
-const db = firebase.firestore();
+const firestore = firebase.firestore();
 const functions = firebase.app().functions('us-central1');
 
-export { db, functions };
+export { firestore, functions };

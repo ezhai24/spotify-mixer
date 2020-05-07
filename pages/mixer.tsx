@@ -100,7 +100,7 @@ const Mixer = () => {
   return (
     <>
       { currentUser.isPrimaryUser ?
-        <MixerControls />
+        <MixerControls currentUser={ currentUser } />
         :
         <JoinConfirmation />
       }
