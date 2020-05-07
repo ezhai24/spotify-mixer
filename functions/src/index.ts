@@ -1,8 +1,14 @@
 import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-// export const helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
+admin.initializeApp();
+
+exports.createSession = functions.https.onCall(async (data) => {
+  const { displayName } = data;
+  const session = await admin.firestore().collection('sessions').add({
+    users: [displayName],
+  });
+  return {
+    sessionId: session.id,
+  };
+});
