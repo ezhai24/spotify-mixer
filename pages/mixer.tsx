@@ -28,6 +28,10 @@ const Mixer = () => {
     const createSession = functions.httpsCallable('createSession');
     const { data: { sessionId } } = await createSession({ displayName });
     setCurrentUser(user => ({ ...user, sessionId }));
+
+    // We only set this so that it can be accessed to clean up
+    // the current session on page unload
+    Cookies.set('session', sessionId);
   };
 
   useEffect(() => {
@@ -38,15 +42,32 @@ const Mixer = () => {
     const code = urlParams.get('code');
 
     if (state === storedState && code) {
+      getToken(code);
+
       const sessionUser = JSON.parse(state.slice(16));
       setCurrentUser(user => ({ ...user, ...sessionUser }));
-
       sessionUser.isPrimaryUser && createSession(sessionUser);
-
-      getToken(code);
     } else {
       setAuthError('Something went wrong. Please try again later.');
     }
+  }, []);
+
+  useEffect(() => {
+    // Alert user that changes will not be saved before unload
+    window.addEventListener('beforeunload', (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+    });
+
+    // Clean up session in Firestore on unload
+    window.addEventListener('unload', () => {
+      navigator.sendBeacon(
+        END_POINTS.endSession(),
+        JSON.stringify({
+          sessionId: Cookies.get('session'),
+        }),
+      );
+    });
   }, []);
 
   if (authError) {
