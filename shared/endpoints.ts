@@ -21,5 +21,6 @@ export const SPOTIFY_END_POINTS = {
 
 export const END_POINTS = {
   getToken: () => '/api/token',
+  leaveSession: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/leaveSession',
   endSession: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/endSession',
 };

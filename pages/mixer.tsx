@@ -69,12 +69,18 @@ const Mixer = () => {
 
       // Clean up session in Firestore on unload
       window.addEventListener('unload', () => {
-        if (sessionUser.isPrimaryUser) {
+        const { isPrimaryUser, displayName, sessionId } = sessionUser;
+        if (isPrimaryUser) {
           navigator.sendBeacon(
             END_POINTS.endSession(),
             JSON.stringify({
               sessionId: Cookies.get('session'),
             }),
+          );
+        } else {
+          navigator.sendBeacon(
+            END_POINTS.leaveSession(),
+            JSON.stringify({ sessionId, displayName }),
           );
         }
       });

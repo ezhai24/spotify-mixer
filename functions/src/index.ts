@@ -41,3 +41,16 @@ exports.joinSession = functions.https.onCall(async (data) => {
 
   return null;
 });
+
+exports.leaveSession = functions.https.onRequest(async (req, res) => {
+  const { method } = req;
+  if (method === 'POST') {
+    const { body } = req;
+    const { displayName, sessionId } = JSON.parse(body);
+    await admin.firestore().collection('sessions').doc(sessionId).update({
+      users: admin.firestore.FieldValue.arrayRemove(displayName),
+    });
+  }
+  res.end();
+});
+
