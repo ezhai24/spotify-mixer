@@ -18,6 +18,6 @@ if (!firebase.apps.length) {
 }
 
 const db = firebase.firestore();
-const functions = firebase.functions();
+const functions = firebase.app().functions('us-central1');
 
 export { db, functions };

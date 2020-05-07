@@ -3,23 +3,31 @@ import Cookies from 'js-cookie';
 
 import { MixerControls, JoinConfirmation } from '~/components';
 
+import { functions } from '~/services/firebase';
 import { END_POINTS, SPOTIFY_STATE_KEY } from '~/shared/endpoints';
-import { User } from '~/shared/types';
+import { SessionUser } from '~/shared/types';
 
 const Mixer = () => {
-  const [user, setUser] = useState<User>();
+  const [currentUser, setCurrentUser] = useState<SessionUser>({});
   const [authError, setAuthError] = useState<string>();
   
-  const getToken = async (code, isPrimaryUser) => {
+  const getToken = async (code) => {
     const tokenEndpoint = END_POINTS.getToken();
     const response = await fetch(tokenEndpoint, {
       method: 'POST',
       body: JSON.stringify({ code }),
     });
     const auth = await response.json();
-    setUser({ ...auth, isPrimaryUser });
-
+    setCurrentUser(user => ({ ...user, auth }));
+    
     window.history.replaceState({}, document.title, '/mixer');
+  };
+
+  const createSession = async (user: SessionUser) => {
+    const { displayName } = user;
+    const createSession = functions.httpsCallable('createSession');
+    const { data: { sessionId } } = await createSession({ displayName });
+    setCurrentUser(user => ({ ...user, sessionId }));
   };
 
   useEffect(() => {
@@ -30,9 +38,12 @@ const Mixer = () => {
     const code = urlParams.get('code');
 
     if (state === storedState && code) {
-      const stateSuffix = state.slice(-1);
-      const isPrimaryUser = stateSuffix === 'P';
-      getToken(code, isPrimaryUser);
+      const sessionUser = JSON.parse(state.slice(16));
+      setCurrentUser(user => ({ ...user, ...sessionUser }));
+
+      sessionUser.isPrimaryUser && createSession(sessionUser);
+
+      getToken(code);
     } else {
       setAuthError('Something went wrong. Please try again later.');
     }
@@ -42,13 +53,13 @@ const Mixer = () => {
     return authError;
   }
 
-  if (!user) {
+  if (!currentUser.sessionId) {
     return 'Loading...';
   }
 
   return (
     <>
-      { user.isPrimaryUser ?
+      { currentUser.isPrimaryUser ?
         <MixerControls />
         :
         <JoinConfirmation />
