@@ -23,15 +23,28 @@ const Mixer = () => {
     window.history.replaceState({}, document.title, '/mixer');
   };
 
-  const createSession = async (user: SessionUser) => {
-    const { displayName } = user;
-    const createSession = functions.httpsCallable('createSession');
-    const { data: { sessionId } } = await createSession({ displayName });
-    setCurrentUser(user => ({ ...user, sessionId }));
+  const createOrJoinSession = async (user: SessionUser) => {
+    const { isPrimaryUser, displayName } = user;
 
-    // We only set this so that it can be accessed to clean up
-    // the current session on page unload
-    Cookies.set('session', sessionId);
+    if (isPrimaryUser) {
+      const createSession = functions.httpsCallable('createSession');
+      const { data: { sessionId } } = await createSession({ displayName });
+      setCurrentUser(user => ({ ...user, sessionId }));
+
+      // We only set this so that it can be accessed to clean up
+      // the current session on page unload
+      Cookies.set('session', sessionId);
+    } else {
+      const joinSession = functions.httpsCallable('joinSession');
+      try {
+        await joinSession({
+          displayName,
+          sessionId: user.sessionId,
+        });
+      } catch {
+        setAuthError('A user with this name already exists. Please try again.');
+      }
+    }
   };
 
   useEffect(() => {
@@ -46,28 +59,28 @@ const Mixer = () => {
 
       const sessionUser = JSON.parse(state.slice(16));
       setCurrentUser(user => ({ ...user, ...sessionUser }));
-      sessionUser.isPrimaryUser && createSession(sessionUser);
+      createOrJoinSession(sessionUser);
+
+      // Alert user that changes will not be saved before unload
+      window.addEventListener('beforeunload', (e) => {
+        e.preventDefault();
+        e.returnValue = '';
+      });
+
+      // Clean up session in Firestore on unload
+      window.addEventListener('unload', () => {
+        if (sessionUser.isPrimaryUser) {
+          navigator.sendBeacon(
+            END_POINTS.endSession(),
+            JSON.stringify({
+              sessionId: Cookies.get('session'),
+            }),
+          );
+        }
+      });
     } else {
       setAuthError('Something went wrong. Please try again later.');
     }
-  }, []);
-
-  useEffect(() => {
-    // Alert user that changes will not be saved before unload
-    window.addEventListener('beforeunload', (e) => {
-      e.preventDefault();
-      e.returnValue = '';
-    });
-
-    // Clean up session in Firestore on unload
-    window.addEventListener('unload', () => {
-      navigator.sendBeacon(
-        END_POINTS.endSession(),
-        JSON.stringify({
-          sessionId: Cookies.get('session'),
-        }),
-      );
-    });
   }, []);
 
   if (authError) {

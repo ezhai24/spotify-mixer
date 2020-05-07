@@ -22,3 +22,22 @@ exports.endSession = functions.https.onRequest(async (req, res) => {
   }
   res.end();
 });
+
+exports.joinSession = functions.https.onCall(async (data) => {
+  const { displayName, sessionId } = data;
+
+  const session = await admin.firestore().collection('sessions').doc(sessionId).get();
+  const sessionUsers = session.get('users');
+  if (sessionUsers.includes(displayName)) {
+    throw new functions.https.HttpsError(
+      'already-exists',
+      'A user with this name has already joined this session',
+    );
+  }
+
+  await admin.firestore().collection('sessions').doc(sessionId).update({
+    users: admin.firestore.FieldValue.arrayUnion(displayName),
+  });
+
+  return null;
+});

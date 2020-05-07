@@ -7,11 +7,21 @@ import { SessionUser } from '~/shared/types';
 
 const Home = () => {
   const [createFormValues, setCreateFormValues] = useState<SessionUser>({});
+  const [joinFormValues, setJoinFormValues] = useState<SessionUser>({});
 
   const handleCreateChange = (e) => {
     const key = e.target.name;
     const value = e.target.value;
     setCreateFormValues(formValues => ({
+      ...formValues,
+      [key]: value,
+    }));
+  };
+
+  const handleJoinChange = (e) => {
+    const key = e.target.name;
+    const value = e.target.value;
+    setJoinFormValues(formValues => ({
       ...formValues,
       [key]: value,
     }));
@@ -32,14 +42,12 @@ const Home = () => {
   
   const authorizePrimaryUser = (e) => {
     e.preventDefault();
-    const { displayName } = createFormValues;
-    const user = { isPrimaryUser: true, displayName };
-    authorizeUser(user);
+    authorizeUser({ isPrimaryUser: true, ...createFormValues });
   };
 
-  const authorizeSecondaryUser = () => {
-    const user = { isPrimaryUser: false, displayName: '' };
-    authorizeUser(user);
+  const authorizeSecondaryUser = (e) => {
+    e.preventDefault();
+    authorizeUser({ isPrimaryUser: false, ...joinFormValues });
   };
 
   return (
@@ -53,8 +61,22 @@ const Home = () => {
         />
         <button onClick={ authorizePrimaryUser }>Create Session</button>
       </form>
-      
-      <button onClick={ authorizeSecondaryUser }>Join Session</button>
+
+      <form>
+        <input
+          type="text"
+          name="displayName"
+          value={ joinFormValues.displayName || '' }
+          onChange={ handleJoinChange }
+        />
+        <input
+          type="text"
+          name="sessionId"
+          value={ joinFormValues.sessionId || '' }
+          onChange={ handleJoinChange }
+        />
+        <button onClick={ authorizeSecondaryUser }>Join Session</button>
+      </form>
     </>
   );
 };
