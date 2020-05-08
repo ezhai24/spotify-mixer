@@ -18,9 +18,10 @@ const Mixer = () => {
       body: JSON.stringify({ code }),
     });
     const auth = await response.json();
-    setCurrentUser(user => ({ ...user, auth }));
     
     window.history.replaceState({}, document.title, '/mixer');
+
+    return auth;
   };
 
   const createOrJoinSession = async (user: SessionUser) => {
@@ -47,46 +48,54 @@ const Mixer = () => {
     }
   };
 
+  const addCleanupListeners = (user: SessionUser) => {
+    // Alert user that changes will not be saved before unload
+    window.addEventListener('beforeunload', (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+    });
+
+    // Clean up session in Firestore on unload
+    window.addEventListener('unload', () => {
+      const { isPrimaryUser, displayName, sessionId } = user;
+      if (isPrimaryUser) {
+        navigator.sendBeacon(
+          END_POINTS.endSession(),
+          JSON.stringify({
+            sessionId: Cookies.get('session'),
+          }),
+        );
+      } else {
+        navigator.sendBeacon(
+          END_POINTS.leaveSession(),
+          JSON.stringify({ sessionId, displayName }),
+        );
+      }
+    });
+  }
+
   useEffect(() => {
-    const storedState = Cookies.get(SPOTIFY_STATE_KEY);
+    const makeRequest = async () => {
+      const storedState = Cookies.get(SPOTIFY_STATE_KEY);
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const state = urlParams.get('state');
-    const code = urlParams.get('code');
+      const urlParams = new URLSearchParams(window.location.search);
+      const state = urlParams.get('state');
+      const code = urlParams.get('code');
 
-    if (state === storedState && code) {
-      getToken(code);
+      if (state === storedState && code) {
+        const auth = await getToken(code);
+        const sessionUser = JSON.parse(state.slice(16));
+        const user = { ...sessionUser, auth };
+        setCurrentUser(currentUser => ({ ...currentUser, ...user }));
 
-      const sessionUser = JSON.parse(state.slice(16));
-      setCurrentUser(user => ({ ...user, ...sessionUser }));
-      createOrJoinSession(sessionUser);
+        createOrJoinSession(user);
 
-      // Alert user that changes will not be saved before unload
-      window.addEventListener('beforeunload', (e) => {
-        e.preventDefault();
-        e.returnValue = '';
-      });
-
-      // Clean up session in Firestore on unload
-      window.addEventListener('unload', () => {
-        const { isPrimaryUser, displayName, sessionId } = sessionUser;
-        if (isPrimaryUser) {
-          navigator.sendBeacon(
-            END_POINTS.endSession(),
-            JSON.stringify({
-              sessionId: Cookies.get('session'),
-            }),
-          );
-        } else {
-          navigator.sendBeacon(
-            END_POINTS.leaveSession(),
-            JSON.stringify({ sessionId, displayName }),
-          );
-        }
-      });
-    } else {
-      setAuthError('Something went wrong. Please try again later.');
+        addCleanupListeners(user);        
+      } else {
+        setAuthError('Something went wrong. Please try again later.');
+      }
     }
+    makeRequest();
   }, []);
 
   if (authError) {

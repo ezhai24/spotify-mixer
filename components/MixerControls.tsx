@@ -16,7 +16,7 @@ const MixerControls = (props: Props) => {
   useEffect(() => {
     firestore.collection('sessions').doc(sessionId).onSnapshot(snapshot => {
       const users = snapshot.get('users');
-      if (users.length !== sessionUsers.length) {
+      if (users && users.length !== sessionUsers.length) {
         setSessionUsers(users);
       };
     });
