@@ -42,6 +42,11 @@ const Mixer = () => {
     }
   };
 
+  const getUserTop = async () => {
+    const topEndpoint = END_POINTS.getTop()
+    await fetch(topEndpoint);
+  };
+
   const addCleanupListeners = (user: SessionUser) => {
     // Alert user that changes will not be saved before unload
     window.addEventListener('beforeunload', (e) => {
@@ -74,6 +79,7 @@ const Mixer = () => {
       if (user) {
         setCurrentUser(currentUser => ({ ...currentUser, ...user }));
         createOrJoinSession(user);
+        getUserTop();
         addCleanupListeners(user);
       } else {
         setAuthError('Something went wrong. Please try again')

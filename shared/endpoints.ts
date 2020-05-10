@@ -5,6 +5,7 @@ const clientId = process.env.SPOTIFY_CLIENT_ID;
 
 export const END_POINTS = {
   getToken: () => '/api/token',
+  getTop: () => '/api/top',
   leaveSession: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/leaveSession',
   endSession: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/endSession',
 };
@@ -22,4 +23,5 @@ export const SPOTIFY_END_POINTS = {
       state,
     }),
   getToken: () => 'https://accounts.spotify.com/api/token',
+  getTopTracks: () => 'https://api.spotify.com/v1/me/top/tracks?limit=50',
 };
