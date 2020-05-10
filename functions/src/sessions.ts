@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+const clientTools = require('firebase-tools');
 
 exports.createSession = functions.https.onCall(async (data) => {
   const { displayName } = data;
@@ -66,9 +67,13 @@ exports.endSession = functions.https.onRequest(async (req, res) => {
   if (method === 'POST') {
     const { body } = req;
     const { sessionId } = JSON.parse(body);
-    await admin.firestore()
-      .collection('sessions').doc(sessionId)
-      .delete();
+    clientTools.firestore
+      .delete(`sessions/${sessionId}`, {
+        project: process.env.GCLOUD_PROJECT,
+        recursive: true,
+        yes: true,
+        token: functions.config().fb.token,
+      });
   }
   res.end();
 });
