@@ -53,11 +53,47 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
   if (method === 'POST') {
     const { body } = req;
     const { displayName, sessionId } = JSON.parse(body);
+
+    // Remove user from session
     await admin.firestore()
       .collection('sessions').doc(sessionId)
       .update({
         users: admin.firestore.FieldValue.arrayRemove(displayName),
       });
+
+    // Remove user's top counts from aggregates
+    const userTops = await admin.firestore()
+      .collection('sessions').doc(sessionId)
+      .collection('topCounts').doc(displayName)
+      .get();
+    const userTopArtists = userTops.get('artists');
+
+    const aggregate = await admin.firestore()
+      .collection('sessions').doc(sessionId)
+      .collection('topCounts').doc('aggregate')
+      .get();
+    const artistCounts = aggregate.get('artistCounts');
+    
+    userTopArtists.forEach((artist: string) => {
+      artistCounts[artist] = artistCounts[artist] - 1;
+      if (artistCounts[artist] === 0) {
+        delete artistCounts[artist];
+      };
+    });
+
+    await admin.firestore()
+      .collection('sessions').doc(sessionId)
+      .collection('topCounts').doc('aggregate')
+      .update({
+        artistCounts,
+        userCount: admin.firestore.FieldValue.increment(-1),
+      });
+
+    // Remove user's top counts document
+    await admin.firestore()
+      .collection('sessions').doc(sessionId)
+      .collection('topCounts').doc(displayName)
+      .delete();
   }
   res.end();
 });
