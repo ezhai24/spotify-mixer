@@ -1,27 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import querystring from 'querystring';
 
 import { MixerControls, JoinConfirmation } from '~/components';
 
 import { functions } from '~/services/firebase';
-import { END_POINTS, SPOTIFY_STATE_KEY } from '~/shared/endpoints';
+import { END_POINTS } from '~/shared/endpoints';
 import { SessionUser } from '~/shared/types';
 
 const Mixer = () => {
   const [currentUser, setCurrentUser] = useState<SessionUser>({});
   const [authError, setAuthError] = useState<string>();
-  
-  const getToken = async (code) => {
-    const tokenEndpoint = END_POINTS.getToken();
-    const response = await fetch(tokenEndpoint, {
-      method: 'POST',
-      body: JSON.stringify({ code }),
-    });
-    const auth = await response.json();
-    
-    window.history.replaceState({}, document.title, '/mixer');
 
-    return auth;
+  const parseUser = () => {
+    const user = querystring.parse(window.location.search.slice(1));
+    window.history.replaceState({}, document.title, '/mixer');
+    return Object.keys(user).length > 0 ? user : null;
   };
 
   const createOrJoinSession = async (user: SessionUser) => {
@@ -76,23 +70,13 @@ const Mixer = () => {
 
   useEffect(() => {
     const makeRequest = async () => {
-      const storedState = Cookies.get(SPOTIFY_STATE_KEY);
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const state = urlParams.get('state');
-      const code = urlParams.get('code');
-
-      if (state === storedState && code) {
-        const auth = await getToken(code);
-        const sessionUser = JSON.parse(state.slice(16));
-        const user = { ...sessionUser, auth };
+      const user = parseUser();
+      if (user) {
         setCurrentUser(currentUser => ({ ...currentUser, ...user }));
-
         createOrJoinSession(user);
-
-        addCleanupListeners(user);        
+        addCleanupListeners(user);
       } else {
-        setAuthError('Something went wrong. Please try again later.');
+        setAuthError('Something went wrong. Please try again')
       }
     }
     makeRequest();

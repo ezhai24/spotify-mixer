@@ -1,10 +1,15 @@
 import querystring from 'querystring';
-import routes from '~/shared/routes';
 
 const baseUrl = process.env.HOST;
 const clientId = process.env.SPOTIFY_CLIENT_ID;
 
-export const REDIRECT_URI = baseUrl + routes.mixer;
+export const END_POINTS = {
+  getToken: () => '/api/token',
+  leaveSession: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/leaveSession',
+  endSession: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/endSession',
+};
+
+export const REDIRECT_URI = baseUrl + END_POINTS.getToken();
 export const SPOTIFY_STATE_KEY = 'spotify_auth_state';
 
 export const SPOTIFY_END_POINTS = {
@@ -17,10 +22,4 @@ export const SPOTIFY_END_POINTS = {
       state,
     }),
   getToken: () => 'https://accounts.spotify.com/api/token',
-};
-
-export const END_POINTS = {
-  getToken: () => '/api/token',
-  leaveSession: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/leaveSession',
-  endSession: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/endSession',
 };
