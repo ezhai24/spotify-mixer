@@ -14,8 +14,12 @@ const Mixer = () => {
 
   const parseUser = () => {
     const user = querystring.parse(window.location.search.slice(1));
+    const parsedUser = {
+      ...user,
+      isPrimaryUser: user.isPrimaryUser === 'true',
+    };
     window.history.replaceState({}, document.title, '/mixer');
-    return Object.keys(user).length > 0 ? user : null;
+    return Object.keys(parsedUser).length > 0 ? parsedUser : null;
   };
 
   const createOrJoinSession = async (user: SessionUser) => {
