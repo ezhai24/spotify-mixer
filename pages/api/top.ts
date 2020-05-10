@@ -8,23 +8,23 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { sessionId, displayName } = JSON.parse(body);
 
     // Get current user's top tracks from Spotify
-    const getTopTracksEndpoint = SPOTIFY_END_POINTS.getTopTracks();
-    const response = await fetch(getTopTracksEndpoint, {
+    const getTopArtistsEndpoint = SPOTIFY_END_POINTS.getTopArtists();
+    const response = await fetch(getTopArtistsEndpoint, {
       headers: {
         'Authorization': 'Bearer ' + req.cookies.accessToken,
       },
     });
-    const topTracks = await response.json();
+    const topArtists = await response.json();
 
     // Save top tracks to Firebase
-    const tracks = topTracks.items.map(track => track.id);
-    const addTrackCountsEndpoint = END_POINTS.addTrackCounts();
-    fetch(addTrackCountsEndpoint, {
+    const artists = topArtists.items.map(artist => artist.id);
+    const addArtistCountsEndpoint = END_POINTS.addArtistCounts();
+    fetch(addArtistCountsEndpoint, {
       method: 'POST',
       body: JSON.stringify({
         sessionId,
         user: displayName,
-        tracks,
+        artists,
       }),
     });
 

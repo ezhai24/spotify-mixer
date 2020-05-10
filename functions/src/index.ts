@@ -7,5 +7,5 @@ exports.joinSession = sessions.joinSession;
 exports.leaveSession = sessions.leaveSession;
 exports.endSession = sessions.endSession;
 
-const trackCounts = require('./trackCounts');
-exports.addTrackCounts = trackCounts.addTrackCounts;
+const topCounts = require('./topCounts');
+exports.addArtistCounts = topCounts.addArtistCounts;

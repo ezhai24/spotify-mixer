@@ -14,10 +14,10 @@ exports.createSession = functions.https.onCall(async (data) => {
   const { id: sessionId } = session;
   await admin.firestore()
     .collection('sessions').doc(sessionId)
-    .collection('trackCounts').doc('aggregate')
+    .collection('topCounts').doc('aggregate')
     .set({
       userCount: 0,
-      trackCounts: {},
+      artistCounts: {},
     });
   
   return {
