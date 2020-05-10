@@ -22,17 +22,18 @@ const Mixer = () => {
     return Object.keys(parsedUser).length > 0 ? parsedUser : null;
   };
 
-  const createOrJoinSession = async (user: SessionUser) => {
+  const createOrJoinSession = async (user: SessionUser): Promise<SessionUser> => {
     const { isPrimaryUser, displayName } = user;
 
     if (isPrimaryUser) {
       const createSession = functions.httpsCallable('createSession');
       const { data: { sessionId } } = await createSession({ displayName });
-      setCurrentUser(user => ({ ...user, sessionId }));
 
       // We only set this so that it can be accessed to clean up
       // the current session on page unload
       Cookies.set('session', sessionId);
+
+      return { ...user, sessionId };
     } else {
       const joinSession = functions.httpsCallable('joinSession');
       try {
@@ -44,11 +45,16 @@ const Mixer = () => {
         setAuthError('A user with this name already exists. Please try again.');
       }
     }
+
+    return user;
   };
 
-  const getUserTop = async () => {
-    const topEndpoint = END_POINTS.getTop()
-    await fetch(topEndpoint);
+  const getUserTop = async (user: SessionUser) => {
+    const topEndpoint = END_POINTS.saveTop()
+    await fetch(topEndpoint, {
+      method: 'POST',
+      body: JSON.stringify(user),
+    });
   };
 
   const addCleanupListeners = (user: SessionUser) => {
@@ -79,12 +85,13 @@ const Mixer = () => {
 
   useEffect(() => {
     const makeRequest = async () => {
-      const user = parseUser();
+      let user: SessionUser = parseUser();
       if (user) {
-        setCurrentUser(currentUser => ({ ...currentUser, ...user }));
-        createOrJoinSession(user);
-        getUserTop();
+        user = await createOrJoinSession(user);
+        getUserTop(user);
         addCleanupListeners(user);
+
+        setCurrentUser(currentUser => ({ ...currentUser, ...user }));
       } else {
         setAuthError('Something went wrong. Please try again')
       }
