@@ -11,3 +11,7 @@ export interface SessionUser {
   sessionId?: string;
   auth?: UserAuth;
 };
+
+export interface RecommendationOptions {
+  seedArtists: string[];
+}

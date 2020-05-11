@@ -7,5 +7,6 @@ exports.joinSession = sessions.joinSession;
 exports.leaveSession = sessions.leaveSession;
 exports.endSession = sessions.endSession;
 
-const topCounts = require('./topCounts');
-exports.addArtistCounts = topCounts.addArtistCounts;
+const playlist = require('./playlist');
+exports.addArtistCounts = playlist.addArtistCounts;
+exports.createPlaylist = playlist.createPlaylist;

@@ -36,3 +36,15 @@ exports.addArtistCounts = functions.https.onRequest(async (req, res) => {
   }
   res.end();
 });
+
+exports.createPlaylist = functions.https.onRequest(async (req, res) => {
+  const { method } = req;
+  if (method === 'POST') {
+    const { body } = req;
+    const { sessionId, playlist } = JSON.parse(body);
+    await admin.firestore()
+      .collection('sessions').doc(sessionId)
+      .update({ playlist });
+    res.end();
+  }
+});
