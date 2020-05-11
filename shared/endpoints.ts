@@ -1,15 +1,19 @@
 import querystring from 'querystring';
-import { RecommendationOptions } from '~/shared/types';
 
 const baseUrl = process.env.HOST;
 const clientId = process.env.SPOTIFY_CLIENT_ID;
 
+interface RecommendationOptions {
+  seedArtists: string[];
+}
+
 export const END_POINTS = {
   getToken: () => '/api/token',
   createSession: () => '/api/sessions',
-  joinSession: (sessionId) => `/api/sessions/${sessionId}`,
+  joinSession: (sessionId: string) => `/api/sessions/${sessionId}`,
   saveTop: () => '/api/top',
   generatePlaylist: (sessionId: string) => `/api/playlist?sessionId=${sessionId}`,
+  savePlaylist: () => '/api/playlist',
 };
 
 export const FIREBASE_END_POINTS = {
@@ -34,10 +38,13 @@ export const SPOTIFY_END_POINTS = {
       state,
     }),
   getToken: () => 'https://accounts.spotify.com/api/token',
+  getUserData: () => 'https://api.spotify.com/v1/me',
   getTopArtists: () => 'https://api.spotify.com/v1/me/top/artists?limit=50',
   getRecommendations: ({ seedArtists }: RecommendationOptions) => 'https://api.spotify.com/v1/recommendations?' +
     querystring.stringify({
       seed_artists: seedArtists,
       limit: 100,
     }),
+  createPlaylist: (userId: string) => `https://api.spotify.com/v1/users/${userId}/playlists`,
+  addToPlaylist: (playlistId: string) => `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
 };

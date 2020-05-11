@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SessionUser } from '~/shared/types';
+import { SessionUser, Playlist } from '~/shared/types';
 
 import { firestore } from '~/services/firebase';
 import { END_POINTS } from '~/shared/endpoints';
@@ -13,7 +13,7 @@ const MixerControls = (props: Props) => {
   const { sessionId } = currentUser;
 
   const [sessionUsers, setSessionUsers] = useState([]);
-  const [playlist, setPlaylist] = useState([]);
+  const [playlist, setPlaylist] = useState<Playlist>({ tracks: [] });
 
   useEffect(() => {
     firestore.collection('sessions').doc(sessionId).onSnapshot(snapshot => {
@@ -28,21 +28,64 @@ const MixerControls = (props: Props) => {
     const generatePlaylistEndpoint = END_POINTS.generatePlaylist(sessionId);
     const response = await fetch(generatePlaylistEndpoint);
     const tracks = await response.json();
-    setPlaylist(tracks);
+    setPlaylist(playlist => ({ ...playlist, tracks }));
   };
+
+  const handlePlaylistChange = (e) => {
+    const key = e.target.name;
+    const value = e.target.value;
+    setPlaylist(playlist => ({
+      ...playlist,
+      [key]: value,
+    }));
+  };
+
+  const savePlaylist = async (e) => {
+    e.preventDefault();
+    const savePlaylistEndpoint = END_POINTS.savePlaylist();
+    const response = await fetch(savePlaylistEndpoint, {
+      method: 'POST',
+      body: JSON.stringify({
+        name: playlist.name,
+        trackUris: playlist.tracks.map(track => `spotify:track:${track.id}`),
+      }),
+    });
+    const playlistData = await response.json();
+    setPlaylist(playlist => ({
+      ...playlist,
+      url: playlistData.playlistUrl,
+    }));
+  }
   
   return (
     <>
       <p>You've created a session!</p>
       <p>Session ID: { sessionId }</p>
+      
       <p>Current Members</p>
       <ul>
         { sessionUsers.map(user => <li key={ user }>{ user }</li>) }
       </ul>
+
       <p>Playlist</p>
+      <button onClick={ generatePlaylist }>Generate playlist</button>
+      <form>
+        <input
+          type="text"
+          name="name"
+          value={ playlist.name || '' }
+          onChange={ handlePlaylistChange }
+        />
+        <button onClick={ savePlaylist }>Save to Spotify</button>
+      </form>
+      { playlist.url &&
+        <a href={ playlist.url } target="_blank" rel="noopener noreferrer">
+          View on Spotify
+        </a>
+      }
       <ul>
-        { playlist.map(song => {
-          const { id, name, artists, albumName, duration } = song;
+        { playlist.tracks.map(track => {
+          const { id, name, artists, albumName, duration } = track;
           return (
             <div key={ id }>
               <li>{ name }</li>
@@ -55,7 +98,6 @@ const MixerControls = (props: Props) => {
           );
         }) }
       </ul>
-      <button onClick={ generatePlaylist }>Generate playlist</button>
     </>
   );
 };

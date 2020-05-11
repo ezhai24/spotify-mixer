@@ -4,6 +4,7 @@ import { SPOTIFY_END_POINTS, FIREBASE_END_POINTS } from '~/shared/endpoints';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { method } = req;
+
   if (method === 'GET') {
     const { query } = req;
     const { sessionId } = query;
@@ -49,6 +50,47 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     res.send(playlist);
+  }
+
+  if (method === 'POST') {
+    const { body } = req;
+    const { name: playlistName, trackUris } = JSON.parse(body);
+
+    // Get the current user's Spotify ID
+    const userDataEndpoint = SPOTIFY_END_POINTS.getUserData();
+    const userDataResponse = await fetch(userDataEndpoint, {
+      headers: {
+        'Authorization': 'Bearer ' + req.cookies.accessToken,
+      },
+    });
+    const { id: userId } = await userDataResponse.json();
+
+    // Create an empty playlist
+    const createPlaylistEndpoint = SPOTIFY_END_POINTS.createPlaylist(userId);
+    const playlistResponse = await fetch(createPlaylistEndpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + req.cookies.accessToken,
+      },
+      body: JSON.stringify({
+        name: playlistName,
+      }),
+    });
+    const { id: playlistId, external_urls } = await playlistResponse.json();
+
+    // Add tracks to playlist
+    const addToPlaylistEndpoint = SPOTIFY_END_POINTS.addToPlaylist(playlistId);
+    await fetch(addToPlaylistEndpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + req.cookies.accessToken,
+      },
+      body: JSON.stringify({
+        uris: trackUris,
+      }),
+    });
+
+    res.send({ playlistUrl: external_urls.spotify });
   }
 };
 

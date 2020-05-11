@@ -12,6 +12,16 @@ export interface SessionUser {
   auth?: UserAuth;
 };
 
-export interface RecommendationOptions {
-  seedArtists: string[];
+interface Track {
+  id: string,
+  name: string,
+  artists: string[],
+  albumName: string,
+  duration: number,
+}
+
+export interface Playlist {
+  name?: string;
+  tracks: Track[];
+  url?: string;
 }
