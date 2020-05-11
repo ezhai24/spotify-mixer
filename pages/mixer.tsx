@@ -26,8 +26,14 @@ const Mixer = () => {
     const { isPrimaryUser, displayName } = user;
 
     if (isPrimaryUser) {
-      const createSession = functions.httpsCallable('createSession');
-      const { data: { sessionId } } = await createSession({ displayName });
+      const createSessionEndpoint = END_POINTS.createSession();
+      const response = await fetch(createSessionEndpoint, {
+        method: 'POST',
+        body: JSON.stringify({
+          user: displayName,
+        }),
+      });
+      const { sessionId } = await response.json();
 
       // We only set this so that it can be accessed to clean up
       // the current session on page unload
@@ -35,11 +41,14 @@ const Mixer = () => {
 
       return { ...user, sessionId };
     } else {
-      const joinSession = functions.httpsCallable('joinSession');
+      const { sessionId } = user;
+      const joinSessionEndpoint = END_POINTS.joinSession(sessionId);
       try {
-        await joinSession({
-          displayName,
-          sessionId: user.sessionId,
+        await fetch(joinSessionEndpoint, {
+          method: 'POST',
+          body: JSON.stringify({
+            user: displayName,
+          }),
         });
       } catch {
         setAuthError('A user with this name already exists. Please try again.');
