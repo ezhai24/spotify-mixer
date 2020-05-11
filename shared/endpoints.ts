@@ -8,6 +8,9 @@ export const END_POINTS = {
   getToken: () => '/api/token',
   saveTop: () => '/api/top',
   generatePlaylist: (sessionId: string) => `/api/playlist?sessionId=${sessionId}`,
+};
+
+export const FIREBASE_END_POINTS = {
   addArtistCounts: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/addArtistCounts',
   leaveSession: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/leaveSession',
   endSession: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/endSession',

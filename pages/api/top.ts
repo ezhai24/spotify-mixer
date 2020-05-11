@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { SPOTIFY_END_POINTS, END_POINTS } from '~/shared/endpoints';
+import { SPOTIFY_END_POINTS, FIREBASE_END_POINTS } from '~/shared/endpoints';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { method } = req;
@@ -18,7 +18,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // Save top tracks to Firebase
     const artists = topArtists.items.map(artist => artist.id);
-    const addArtistCountsEndpoint = END_POINTS.addArtistCounts();
+    const addArtistCountsEndpoint = FIREBASE_END_POINTS.addArtistCounts();
     fetch(addArtistCountsEndpoint, {
       method: 'POST',
       body: JSON.stringify({

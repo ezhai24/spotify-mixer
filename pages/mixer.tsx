@@ -5,7 +5,7 @@ import querystring from 'querystring';
 import { MixerControls, JoinConfirmation } from '~/components';
 
 import { functions } from '~/services/firebase';
-import { END_POINTS } from '~/shared/endpoints';
+import { END_POINTS, FIREBASE_END_POINTS } from '~/shared/endpoints';
 import { SessionUser } from '~/shared/types';
 
 const Mixer = () => {
@@ -69,14 +69,14 @@ const Mixer = () => {
       const { isPrimaryUser, displayName, sessionId } = user;
       if (isPrimaryUser) {
         navigator.sendBeacon(
-          END_POINTS.endSession(),
+          FIREBASE_END_POINTS.endSession(),
           JSON.stringify({
             sessionId: Cookies.get('session'),
           }),
         );
       } else {
         navigator.sendBeacon(
-          END_POINTS.leaveSession(),
+          FIREBASE_END_POINTS.leaveSession(),
           JSON.stringify({ sessionId, displayName }),
         );
       }

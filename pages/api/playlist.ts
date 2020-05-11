@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { firestore } from '~/services/firebase';
-import { SPOTIFY_END_POINTS, END_POINTS } from '~/shared/endpoints';
+import { SPOTIFY_END_POINTS, FIREBASE_END_POINTS } from '~/shared/endpoints';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { method } = req;
@@ -39,7 +39,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }));
 
     // Save playlist to Firestore
-    const createPlaylistEndpoint = END_POINTS.createPlaylist();
+    const createPlaylistEndpoint = FIREBASE_END_POINTS.createPlaylist();
     fetch(createPlaylistEndpoint, {
       method: 'POST',
       body: JSON.stringify({
