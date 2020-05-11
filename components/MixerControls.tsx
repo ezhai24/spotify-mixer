@@ -17,8 +17,8 @@ const MixerControls = (props: Props) => {
 
   useEffect(() => {
     firestore.collection('sessions').doc(sessionId).onSnapshot(snapshot => {
-      const users = snapshot.get('users');
-      if (users && users.length !== sessionUsers.length) {
+      const { users, userCount } = snapshot.data();
+      if (users && users.length !== sessionUsers.length && users.length === userCount) {
         setSessionUsers(users);
       };
     });
@@ -68,7 +68,12 @@ const MixerControls = (props: Props) => {
       </ul>
 
       <p>Playlist</p>
-      <button onClick={ generatePlaylist }>Generate playlist</button>
+      <button
+        disabled={ sessionUsers.length < 1 }
+        onClick={ generatePlaylist }
+      >
+        Generate playlist
+      </button>
       <form>
         <input
           type="text"

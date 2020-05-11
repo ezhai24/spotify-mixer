@@ -29,12 +29,17 @@ exports.addArtistCounts = functions.https.onRequest(async (req, res) => {
     await admin.firestore()
       .collection('sessions').doc(sessionId)
       .collection('topCounts').doc('aggregate')
+      .update({ artistCounts });
+
+    // Update user count
+    await admin.firestore()
+      .collection('sessions').doc(sessionId)
       .update({
         userCount: admin.firestore.FieldValue.increment(1),
-        artistCounts,
       });
+
+    res.end();
   }
-  res.end();
 });
 
 exports.createPlaylist = functions.https.onRequest(async (req, res) => {

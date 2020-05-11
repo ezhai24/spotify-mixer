@@ -11,7 +11,10 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
     // Create session
     const session = await admin.firestore()
       .collection('sessions')
-      .add({ users: [user] });
+      .add({
+        users: [user],
+        userCount: 0,
+      });
     
     // Create trackCounts subcollection with empty aggregate document
     const { id: sessionId } = session;
@@ -19,7 +22,6 @@ exports.createSession = functions.https.onRequest(async (req, res) => {
       .collection('sessions').doc(sessionId)
       .collection('topCounts').doc('aggregate')
       .set({
-        userCount: 0,
         artistCounts: {},
       });
     
@@ -60,13 +62,6 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
     const { body } = req;
     const { displayName, sessionId } = JSON.parse(body);
 
-    // Remove user from session
-    await admin.firestore()
-      .collection('sessions').doc(sessionId)
-      .update({
-        users: admin.firestore.FieldValue.arrayRemove(displayName),
-      });
-
     // Remove user's top counts from aggregates
     const userTops = await admin.firestore()
       .collection('sessions').doc(sessionId)
@@ -90,8 +85,13 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
     await admin.firestore()
       .collection('sessions').doc(sessionId)
       .collection('topCounts').doc('aggregate')
+      .update({ artistCounts });
+
+    // Remove user from session
+    await admin.firestore()
+      .collection('sessions').doc(sessionId)
       .update({
-        artistCounts,
+        users: admin.firestore.FieldValue.arrayRemove(displayName),
         userCount: admin.firestore.FieldValue.increment(-1),
       });
 

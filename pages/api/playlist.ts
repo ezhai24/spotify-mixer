@@ -10,11 +10,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { sessionId } = query;
 
     // Get top counts from Firestore and convert to seeds
+    const session = await firestore
+      .collection('sessions').doc(sessionId as string)
+      .get();
+    const userCount = session.get('userCount');
     const aggregate = await firestore
       .collection('sessions').doc(sessionId as string)
       .collection('topCounts').doc('aggregate')
-      .get()
-    const { artistCounts, userCount } = aggregate.data() || {};
+      .get();
+    const artistCounts = aggregate.get('artistCounts');
     const seedArtists = [];
     Object.keys(artistCounts).some((artist: string) => {
       if (artistCounts[artist] === userCount) {
