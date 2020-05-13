@@ -43,7 +43,6 @@ export const SPOTIFY_END_POINTS = {
   getRecommendations: ({ seedArtists }: RecommendationOptions) => 'https://api.spotify.com/v1/recommendations?' +
     querystring.stringify({
       seed_artists: seedArtists,
-      limit: 100,
     }),
   createPlaylist: (userId: string) => `https://api.spotify.com/v1/users/${userId}/playlists`,
   addToPlaylist: (playlistId: string) => `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
