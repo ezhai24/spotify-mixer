@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
-exports.addArtistCounts = functions.https.onRequest(async (req, res) => {
+exports.addTopCounts = functions.https.onRequest(async (req, res) => {
   const { method } = req;
   if (method === 'POST') {
     const { body } = req;

@@ -8,5 +8,5 @@ exports.leaveSession = sessions.leaveSession;
 exports.endSession = sessions.endSession;
 
 const playlist = require('./playlist');
-exports.addArtistCounts = playlist.addArtistCounts;
+exports.addTopCounts = playlist.addTopCounts;
 exports.createPlaylist = playlist.createPlaylist;
