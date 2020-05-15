@@ -1,6 +1,6 @@
 import NextDocument, { Html, Head, Main, NextScript } from 'next/document';
 import { Global } from '@emotion/core';
-import colors from 'shared/colors';
+import { colors } from 'shared/styles';
 
 class Document extends NextDocument {
   render() {

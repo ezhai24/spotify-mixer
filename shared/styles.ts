@@ -1,4 +1,9 @@
-export default {
+const breakpoints = [1200, 768];
+export const mq = breakpoints.map(
+  bp => `@media (max-width: ${bp}px)`
+);
+
+export const colors = {
   primary: '#1FB954',
   background: '#121212',
   backgroundLight: '#282828',

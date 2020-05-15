@@ -6,6 +6,7 @@ import styled from '@emotion/styled';
 import { InputLabel, Input, PrimaryButton } from '~/components/Form';
 import { SPOTIFY_END_POINTS, SPOTIFY_STATE_KEY } from '~/shared/endpoints';
 import { SessionUser } from '~/shared/types';
+import { mq } from '~/shared/styles';
 
 enum FormType {
   NONE,
@@ -13,17 +14,29 @@ enum FormType {
   JOIN,
 }
 
-const Wave = styled.div({
+const Wave = styled.div(({ submittedForm }: { submittedForm: FormType }) => ({
   position: 'fixed',
   top: 0,
   left: 0,
   height: '100%',
   width: '100%',
-  backgroundImage: 'url("wave.png")',
-  backgroundSize: '55% 100%',
+  backgroundImage: 'url("waveLeft.png")',
+  backgroundSize: submittedForm === FormType.NONE ? '55% 100%' : (
+    submittedForm === FormType.CREATE
+      ? '115% 100%'
+      : '0% 100%'
+  ),
   backgroundRepeat: 'no-repeat',
-  transition: 'background-size 1s',
-});
+  transition: submittedForm !== FormType.NONE && 'background-size 1s',
+  [mq[1]]: {
+    backgroundImage: 'url("waveTop.png")',
+    backgroundSize: submittedForm === FormType.NONE ? '100% 320px' : (
+      submittedForm === FormType.CREATE
+        ? '100% 115%'
+        : '100% 0%'
+    ),
+  },
+}));
 
 const FormsContainer = styled.div({
   position: 'relative',
@@ -31,6 +44,9 @@ const FormsContainer = styled.div({
   flexDirection: 'row',
   justifyContent: 'space-evenly',
   margin: '0 20%',
+  [mq[0]]: {
+    margin: '0 10%',
+  },
 });
 
 const Form = styled.form({
@@ -99,20 +115,16 @@ const Home = () => {
   return (
     <div style={{ marginTop: 100 }}>
       <Wave
-        style={{
-          backgroundSize: submittedForm !== FormType.NONE && (
-            submittedForm === FormType.CREATE ? '115% 100%' : '0% 100%'
-          ),
-        }}
-        onTransitionEnd={
+        submittedForm={ submittedForm }
+        onTransitionEnd={ submittedForm !== FormType.NONE ? (
           submittedForm === FormType.CREATE
             ? authorizePrimaryUser
             : authorizeSecondaryUser
-        }
+        ) : null }
       />
       
       <FormsContainer>
-        <Form autoComplete="off" style={{ textAlign: 'right' }}>
+        <Form autoComplete="off">
           <h1 style={{ fontSize: 72 }}>Spotify</h1>
           <InputLabel>YOUR NAME</InputLabel>
           <Input

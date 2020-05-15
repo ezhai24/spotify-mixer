@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import colors from 'shared/colors';
+import { colors } from 'shared/styles';
 
 export const InputLabel = styled.label({
   marginTop: 15,
