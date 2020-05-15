@@ -9,6 +9,8 @@
     "start": "next start"
   },
   "dependencies": {
+    "@emotion/core": "^10.0.28",
+    "@emotion/styled": "^10.0.27",
     "cookie": "^0.4.1",
     "firebase": "^7.14.2",
     "isomorphic-unfetch": "^3.0.0",
