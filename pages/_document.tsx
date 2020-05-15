@@ -14,6 +14,7 @@ class Document extends NextDocument {
           <Global
             styles={{
               'html, body': {
+                overflowX: 'hidden',
                 fontFamily: 'IBM Plex Sans',
                 backgroundColor: colors.backgroundLight,
                 color: colors.primaryText,
