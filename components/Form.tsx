@@ -24,4 +24,8 @@ export const PrimaryButton = styled.button({
   color: colors.primaryText,
   fontSize: 16,
   fontWeight: 'bold',
+  ':hover': {
+    cursor: 'pointer',
+    transform: 'scale(1.02)',
+  }
 });

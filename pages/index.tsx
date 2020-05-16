@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import randomstring from 'randomstring';
 import Cookies from 'js-cookie';
 import styled from '@emotion/styled';
@@ -6,13 +6,20 @@ import styled from '@emotion/styled';
 import { InputLabel, Input, PrimaryButton } from '~/components/Form';
 import { SPOTIFY_END_POINTS, SPOTIFY_STATE_KEY } from '~/shared/endpoints';
 import { SessionUser } from '~/shared/types';
-import { mq } from '~/shared/styles';
+import { mq, colors } from '~/shared/styles';
 
 enum FormType {
   NONE,
   CREATE,
   JOIN,
 }
+
+const PageContainer = styled.div({
+  margin: '150px 0',
+  [mq[1]]: {
+    margin: '50px 0',
+  },
+});
 
 const Wave = styled.div(({ submittedForm }: { submittedForm: FormType }) => ({
   position: 'fixed',
@@ -38,6 +45,30 @@ const Wave = styled.div(({ submittedForm }: { submittedForm: FormType }) => ({
   },
 }));
 
+const Heading = styled.div({
+  position: 'relative',
+  display: 'flex',
+  justifyContent: 'space-evenly',
+  margin: '20px 20%',
+  h1: {
+    width: 250,
+    margin: 0,
+    fontSize: 72,
+    ':first-child': {
+      textAlign: 'right',
+    }
+  },
+  [mq[0]]: {
+    margin: '20px 10%',
+  },
+  [mq[1]]: {
+    flexDirection: 'column',
+    width: 270,
+    margin: '50px auto',
+    textAlign: 'center',
+  },
+});
+
 const FormsContainer = styled.div({
   position: 'relative',
   display: 'flex',
@@ -47,18 +78,46 @@ const FormsContainer = styled.div({
   [mq[0]]: {
     margin: '0 10%',
   },
+  [mq[1]]: {
+    flexDirection: 'column',
+    width: 270,
+    margin: '0 auto',
+  },
 });
 
-const Form = styled.form({
+const Form = styled.form(({ hideForm }: { hideForm: boolean }) => ({
   display: 'flex',
   flexDirection: 'column',
   width: 250,
   margin: 10,
+  [mq[1]]: {
+    display: hideForm && 'none',
+  },
+}));
+
+const Footer = styled.div({
+  display: 'none',
+  marginTop: 20,
+  p: {
+    margin: 3,
+    textAlign: 'center',
+    ':last-child': {
+      color: colors.primary,
+      textDecoration: 'underline',
+      ':hover': {
+        cursor: 'pointer',
+      }
+    },
+  },
+  [mq[1]]: {
+    display: 'block',
+  },
 });
 
 const Home = () => {
   const [createFormValues, setCreateFormValues] = useState<SessionUser>({});
   const [joinFormValues, setJoinFormValues] = useState<SessionUser>({});
+  const [hiddenForm, setHiddenForm] = useState(FormType.JOIN);
   const [submittedForm, setSubmittedForm] = useState(FormType.NONE);
 
   const handleCreateChange = (e) => {
@@ -112,8 +171,19 @@ const Home = () => {
     isPrimaryUser: false,
   });
 
+  const toggleHiddenForm = () => {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+    
+    setHiddenForm(hidden => (
+      hidden === FormType.CREATE
+        ? FormType.JOIN
+        : FormType.CREATE
+    ));
+  };
+
   return (
-    <div style={{ marginTop: 100 }}>
+    <PageContainer>
       <Wave
         submittedForm={ submittedForm }
         onTransitionEnd={ submittedForm !== FormType.NONE ? (
@@ -123,9 +193,12 @@ const Home = () => {
         ) : null }
       />
       
+      <Heading>
+        <h1>Spotify</h1>
+        <h1>Mixer</h1>
+      </Heading>
       <FormsContainer>
-        <Form autoComplete="off">
-          <h1 style={{ fontSize: 72 }}>Spotify</h1>
+        <Form autoComplete="off" hideForm={ hiddenForm === FormType.CREATE }>
           <InputLabel>YOUR NAME</InputLabel>
           <Input
             type="text"
@@ -136,8 +209,7 @@ const Home = () => {
           <PrimaryButton onClick={ submitCreateForm }>CREATE</PrimaryButton>
         </Form>
 
-        <Form autoComplete="off">
-          <h1 style={{ fontSize: 72 }}>Mixer</h1>
+        <Form autoComplete="off" hideForm={ hiddenForm === FormType.JOIN }>
           <InputLabel>YOUR NAME</InputLabel>
           <Input
             type="text"
@@ -154,8 +226,21 @@ const Home = () => {
           />
           <PrimaryButton onClick={ submitJoinForm }>JOIN</PrimaryButton>
         </Form>
+        
+        <Footer>
+          <p>
+            {
+              hiddenForm === FormType.CREATE
+                ? 'Want to start your own session?'
+                : 'Looking for an existing session?'
+            }
+          </p>
+          <p onClick={ toggleHiddenForm }>
+            { hiddenForm === FormType.CREATE ? 'Create' : 'Join' } one now
+          </p>
+        </Footer>
       </FormsContainer>
-    </div>
+    </PageContainer>
   );
 };
 
