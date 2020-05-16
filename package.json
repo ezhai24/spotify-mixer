@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "preinstall": "npx use-yarn",
+    "postinstall": "cd functions && npm install",
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
