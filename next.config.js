@@ -5,7 +5,6 @@ module.exports = {
   webpack: (config) => {
     config.plugins.push(
       new Dotenv({
-        safe: true,
         silent: true,
       })
     );
