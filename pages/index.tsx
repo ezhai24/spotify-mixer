@@ -1,25 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import randomstring from 'randomstring';
 import Cookies from 'js-cookie';
 import styled from '@emotion/styled';
+import Link from 'next/link';
 
 import { InputLabel, Input, PrimaryButton } from '~/components/Form';
 import { SPOTIFY_END_POINTS, SPOTIFY_STATE_KEY } from '~/shared/endpoints';
 import { SessionUser } from '~/shared/types';
 import { mq, colors } from '~/shared/styles';
+import routes from '~/shared/routes';
 
 enum FormType {
   NONE,
   CREATE,
   JOIN,
 }
-
-const PageContainer = styled.div({
-  margin: '150px 0',
-  [mq[1]]: {
-    margin: '50px 0',
-  },
-});
 
 const Wave = styled.div(({ submittedForm }: { submittedForm: FormType }) => ({
   position: 'fixed',
@@ -37,7 +32,7 @@ const Wave = styled.div(({ submittedForm }: { submittedForm: FormType }) => ({
   transition: submittedForm !== FormType.NONE && 'background-size 1s',
   [mq[1]]: {
     backgroundImage: 'url("waveTop.png")',
-    backgroundSize: submittedForm === FormType.NONE ? '100% 320px' : (
+    backgroundSize: submittedForm === FormType.NONE ? '100% 350px' : (
       submittedForm === FormType.CREATE
         ? '100% 115%'
         : '100% 0%'
@@ -45,11 +40,26 @@ const Wave = styled.div(({ submittedForm }: { submittedForm: FormType }) => ({
   },
 }));
 
+const IconContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-end',
+  img: {
+    position: 'relative',
+    height: 30,
+    width: 30,
+    margin: 10,
+  },
+  ':hover': {
+    cursor: 'pointer',
+  },
+});
+
 const Heading = styled.div({
   position: 'relative',
   display: 'flex',
   justifyContent: 'space-evenly',
-  margin: '20px 20%',
+  margin: '75px 20% 20px',
   h1: {
     width: 250,
     margin: 0,
@@ -59,13 +69,18 @@ const Heading = styled.div({
     }
   },
   [mq[0]]: {
-    margin: '20px 10%',
+    margin: '75px 10% 20px',
   },
   [mq[1]]: {
     flexDirection: 'column',
-    width: 270,
-    margin: '50px auto',
-    textAlign: 'center',
+    margin: '20px auto 50px',
+    h1: {      
+      width: 'auto',
+      fontSize: 64,
+      ':first-child, :last-child': {
+        textAlign: 'center',
+      }
+    }
   },
 });
 
@@ -74,14 +89,14 @@ const FormsContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-evenly',
-  margin: '0 20%',
+  margin: '0 20% 100px',
   [mq[0]]: {
-    margin: '0 10%',
+    margin: '0 10% 100px',
   },
   [mq[1]]: {
     flexDirection: 'column',
     width: 270,
-    margin: '0 auto',
+    margin: '0 auto 100px',
   },
 });
 
@@ -174,7 +189,7 @@ const Home = () => {
   const toggleHiddenForm = () => {
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
-    
+
     setHiddenForm(hidden => (
       hidden === FormType.CREATE
         ? FormType.JOIN
@@ -183,7 +198,7 @@ const Home = () => {
   };
 
   return (
-    <PageContainer>
+    <>
       <Wave
         submittedForm={ submittedForm }
         onTransitionEnd={ submittedForm !== FormType.NONE ? (
@@ -192,6 +207,19 @@ const Home = () => {
             : authorizeSecondaryUser
         ) : null }
       />
+
+      <IconContainer>
+        <Link href={ routes.about }>
+          <img src="infoCircle.svg" />
+        </Link>
+        <a
+          href="https://github.com/ezhai24/spotify-mixer"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img src="githubIcon.svg" />
+        </a>
+      </IconContainer>
       
       <Heading>
         <h1>Spotify</h1>
@@ -240,7 +268,7 @@ const Home = () => {
           </p>
         </Footer>
       </FormsContainer>
-    </PageContainer>
+    </>
   );
 };
 
