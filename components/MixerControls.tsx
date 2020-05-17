@@ -3,7 +3,7 @@ import moment from 'moment';
 import styled from '@emotion/styled';
 
 import { Loading } from '~/components';
-import { PrimaryButton } from '~/components/Form';
+import { Button } from '~/components/Form';
 
 import { firestore } from '~/services/firebase';
 import { END_POINTS } from '~/shared/endpoints';
@@ -99,12 +99,13 @@ const MixerControls = (props: Props) => {
         <h1>{ currentUser.displayName }'s Session</h1>
         <span style={{ marginRight: 10 }}>Session Code:</span>
         <span style={{ textDecoration: 'underline' }}>{ sessionId }</span>
-        <PrimaryButton
+        <Button
+          primary
           disabled={ sessionUsers.length < 1 }
           onClick={ generatePlaylist }
         >
           { isGenerating ? <Loading /> : 'GENERATE' }
-        </PrimaryButton>
+        </Button>
       </Header>
       
       <div style={{ display: 'flex', minHeight: 'calc(100% - 264px)' }}>

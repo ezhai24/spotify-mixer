@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 
 import { RemovableListeners } from '~/pages/mixer';
-import { PrimaryButton } from '~/components/Form';
+import { Button } from '~/components/Form';
 import { firestore } from '~/services/firebase';
 import { SessionUser } from '~/shared/types';
 import { END_POINTS } from '~/shared/endpoints';
@@ -76,12 +76,13 @@ const JoinConfirmation = (props: Props) => {
         }
       </Message>
       { sessionIsRunning &&
-        <PrimaryButton
+        <Button
+          primary
           onClick={ leaveSession }
           style={{ width: 200, fontWeight: 'normal' }}
         >
           Leave
-        </PrimaryButton>
+        </Button>
       }
     </PageContainer>
   );

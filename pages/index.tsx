@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 import styled from '@emotion/styled';
 import Link from 'next/link';
 
-import { InputLabel, Input, InputError, PrimaryButton } from '~/components/Form';
+import { InputLabel, Input, InputError, Button } from '~/components/Form';
 import { SPOTIFY_END_POINTS, SPOTIFY_STATE_KEY } from '~/shared/endpoints';
 import { SessionUser } from '~/shared/types';
 import { mq, colors } from '~/shared/styles';
@@ -289,7 +289,7 @@ const Home = () => {
             onChange={ handleCreateChange }
           />
           <InputError>{ formErrors.createForm.displayName }</InputError>
-          <PrimaryButton onClick={ submitCreateForm }>CREATE</PrimaryButton>
+          <Button primary onClick={ submitCreateForm }>CREATE</Button>
         </Form>
 
         <Form autoComplete="off" hideForm={ hiddenForm === FormType.JOIN }>
@@ -310,7 +310,7 @@ const Home = () => {
             onChange={ handleJoinChange }
           />
           <InputError>{ formErrors.joinForm.sessionId }</InputError>
-          <PrimaryButton onClick={ submitJoinForm }>JOIN</PrimaryButton>
+          <Button primary onClick={ submitJoinForm }>JOIN</Button>
         </Form>
         
         <Footer>

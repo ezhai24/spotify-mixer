@@ -21,17 +21,19 @@ export const InputError = styled.p({
   fontSize: 14,
 });
 
-export const PrimaryButton = styled.button({
+export const Button = styled.button(({
+  primary,
+}: { primary?: boolean }) => ({
   marginTop: 20,
-  border: 'none',
+  border: primary ? 'none' : `2px solid ${colors.primary}`,
   borderRadius: 20,
-  backgroundColor: colors.primary,
+  backgroundColor: primary ? colors.primary : 'transparent',
   padding: 8,
   color: colors.primaryText,
   fontSize: 16,
-  fontWeight: 600,
+  fontWeight: primary ? 600 : 'normal',
   ':hover': {
     cursor: 'pointer',
     transform: 'scale(1.02)',
   }
-});
+}));

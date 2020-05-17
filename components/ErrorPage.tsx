@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import styled from '@emotion/styled';
 
-import { PrimaryButton } from '~/components/Form';
+import { Button } from '~/components/Form';
 import routes from '~/shared/routes';
 import { mq } from '~/shared/styles';
 
@@ -26,9 +26,9 @@ const ErrorPage = (props: Props) => {
       <h1 style={{ margin: 0 }}>Uh oh!</h1>
       <p>{ error }</p>
       <Link href={ routes.home }>
-        <PrimaryButton style={{ width: 200, fontWeight: 'normal' }}>
+        <Button primary style={{ width: 200, fontWeight: 'normal' }}>
           Go back
-        </PrimaryButton>
+        </Button>
       </Link>
     </PageContainer>
   );
