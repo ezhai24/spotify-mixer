@@ -11,6 +11,7 @@ export const END_POINTS = {
   getToken: () => '/api/token',
   createSession: () => '/api/sessions',
   joinSession: (sessionId: string) => `/api/sessions/${sessionId}`,
+  leaveSession: (sessionId: string, displayName: string) => `/api/sessions/${sessionId}/users/${displayName}`,
   saveTop: () => '/api/top',
   generatePlaylist: (sessionId: string) => `/api/playlist?sessionId=${sessionId}`,
   savePlaylist: () => '/api/playlist',

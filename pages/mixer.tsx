@@ -7,9 +7,15 @@ import { MixerControls, JoinConfirmation, ErrorPage } from '~/components';
 import { END_POINTS, FIREBASE_END_POINTS } from '~/shared/endpoints';
 import { SessionUser } from '~/shared/types';
 
+export interface RemovableListeners {
+  beforeunload: (this: Window, ev: BeforeUnloadEvent) => any;
+  unload: (this: Window, ev: Event) => any;
+}
+
 const Mixer = () => {
   const [currentUser, setCurrentUser] = useState<SessionUser>({});
   const [authError, setAuthError] = useState<string>();
+  const [listenersToRemove, setListenersToRemove] = useState<RemovableListeners>();
 
   const parseUser = () => {
     const user = querystring.parse(window.location.search.slice(1));
@@ -67,13 +73,14 @@ const Mixer = () => {
 
   const addCleanupListeners = (user: SessionUser) => {
     // Alert user that changes will not be saved before unload
-    window.addEventListener('beforeunload', (e) => {
+    const beforeUnloadHandler = (e) => {
       e.preventDefault();
       e.returnValue = '';
-    });
+    };
+    window.addEventListener('beforeunload', beforeUnloadHandler);
 
     // Clean up session in Firestore on unload
-    window.addEventListener('unload', () => {
+    const onUnloadHandler = () => {
       const { isPrimaryUser, displayName, sessionId } = user;
       if (isPrimaryUser) {
         navigator.sendBeacon(
@@ -88,6 +95,12 @@ const Mixer = () => {
           JSON.stringify({ sessionId, displayName }),
         );
       }
+    };
+    window.addEventListener('unload', onUnloadHandler);
+
+    setListenersToRemove({
+      beforeunload: beforeUnloadHandler,
+      unload: onUnloadHandler,
     });
   }
 
@@ -123,7 +136,10 @@ const Mixer = () => {
       { currentUser.isPrimaryUser ?
         <MixerControls currentUser={ currentUser } />
         :
-        <JoinConfirmation currentUser={ currentUser } />
+        <JoinConfirmation
+          currentUser={ currentUser }
+          listenersToRemove={ listenersToRemove }
+        />
       }
     </>
   );

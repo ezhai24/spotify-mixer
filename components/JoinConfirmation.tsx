@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 
+import { RemovableListeners } from '~/pages/mixer';
 import { PrimaryButton } from '~/components/Form';
 import { firestore } from '~/services/firebase';
 import { SessionUser } from '~/shared/types';
+import { END_POINTS } from '~/shared/endpoints';
+import routes from '~/shared/routes';
 
 interface Props {
   currentUser: SessionUser;
+  listenersToRemove: RemovableListeners;
 }
 
 const PageContainer = styled.div({
@@ -25,8 +30,10 @@ const Message = styled.div({
 });
 
 const JoinConfirmation = (props: Props) => {
-  const { currentUser } = props;
-  const { sessionId } = currentUser;
+  const router = useRouter();
+
+  const { currentUser, listenersToRemove } = props;
+  const { sessionId, displayName } = currentUser;
 
   const [sessionIsRunning, setSessionIsRunning] = useState(true);
 
@@ -37,6 +44,18 @@ const JoinConfirmation = (props: Props) => {
       }
     });
   });
+
+  const leaveSession = async () => {
+    const leaveSessionEndpoint = END_POINTS.leaveSession(sessionId, displayName);
+    await fetch(leaveSessionEndpoint, {
+      method: 'DELETE',
+    });
+
+    window.removeEventListener('beforeunload', listenersToRemove.beforeunload);
+    window.removeEventListener('unload', listenersToRemove.unload);
+
+    router.push(routes.home);
+  };
   
   return (
     <PageContainer>
@@ -57,7 +76,10 @@ const JoinConfirmation = (props: Props) => {
         }
       </Message>
       { sessionIsRunning &&
-        <PrimaryButton style={{ width: 200, fontWeight: 'normal' }}>
+        <PrimaryButton
+          onClick={ leaveSession }
+          style={{ width: 200, fontWeight: 'normal' }}
+        >
           Leave
         </PrimaryButton>
       }
