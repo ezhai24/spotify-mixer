@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import querystring from 'querystring';
 
-import { MixerControls, JoinConfirmation, ErrorPage } from '~/components';
+import { Loading, ErrorPage, MixerControls, JoinConfirmation } from '~/components';
 
 import { END_POINTS, FIREBASE_END_POINTS } from '~/shared/endpoints';
 import { SessionUser } from '~/shared/types';
@@ -128,7 +128,7 @@ const Mixer = () => {
   }
 
   if (!currentUser.sessionId) {
-    return 'Loading...';
+    return <Loading size='lg' style={{ marginTop: 200 }} />;
   }
 
   return (
