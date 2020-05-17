@@ -13,11 +13,13 @@ class Document extends NextDocument {
           />
           <Global
             styles={{
-              'html, body': {
+              'html, body, #__next': {
+                height: '100%',
+                margin: 0,
                 overflowX: 'hidden',
-                fontFamily: 'IBM Plex Sans',
                 backgroundColor: colors.backgroundLight,
                 color: colors.primaryText,
+                fontFamily: 'IBM Plex Sans',
               },
             }}
           />
