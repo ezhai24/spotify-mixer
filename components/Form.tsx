@@ -29,7 +29,7 @@ export const PrimaryButton = styled.button({
   padding: 8,
   color: colors.primaryText,
   fontSize: 16,
-  fontWeight: 'bold',
+  fontWeight: 600,
   ':hover': {
     cursor: 'pointer',
     transform: 'scale(1.02)',

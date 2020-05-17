@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import querystring from 'querystring';
 
-import { MixerControls, JoinConfirmation } from '~/components';
+import { MixerControls, JoinConfirmation, ErrorPage } from '~/components';
 
-import { functions } from '~/services/firebase';
 import { END_POINTS, FIREBASE_END_POINTS } from '~/shared/endpoints';
 import { SessionUser } from '~/shared/types';
 
@@ -43,15 +42,15 @@ const Mixer = () => {
     } else {
       const { sessionId } = user;
       const joinSessionEndpoint = END_POINTS.joinSession(sessionId);
-      try {
-        await fetch(joinSessionEndpoint, {
-          method: 'POST',
-          body: JSON.stringify({
-            user: displayName,
-          }),
-        });
-      } catch {
-        setAuthError('A user with this name already exists. Please try again.');
+      const response = await fetch(joinSessionEndpoint, {
+        method: 'POST',
+        body: JSON.stringify({
+          user: displayName,
+        }),
+      });
+      if (!response.ok) {
+        const { error } = await response.json();
+        throw new Error(error);
       }
     }
 
@@ -96,20 +95,23 @@ const Mixer = () => {
     const makeRequest = async () => {
       let user: SessionUser = parseUser();
       if (user) {
-        user = await createOrJoinSession(user);
-        getUserTop(user);
-        addCleanupListeners(user);
-
-        setCurrentUser(currentUser => ({ ...currentUser, ...user }));
+        try {
+          user = await createOrJoinSession(user);
+          getUserTop(user);
+          addCleanupListeners(user);
+          setCurrentUser(currentUser => ({ ...currentUser, ...user }));
+        } catch (error) {
+          setAuthError(error.message);
+        }
       } else {
-        setAuthError('Something went wrong. Please try again')
+        setAuthError('Something went wrong. Please try again');
       }
     }
     makeRequest();
   }, []);
 
   if (authError) {
-    return authError;
+    return <ErrorPage error={ authError } />;
   }
 
   if (!currentUser.sessionId) {

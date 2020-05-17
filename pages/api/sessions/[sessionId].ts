@@ -16,8 +16,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         user,
       }),
     });
-    const session = response.json();
-    res.send(session);
+    if (!response.ok) {
+      const { error } = await response.json();
+      res.status(response.status).send({ error });
+    }
+    res.end();
   }
 };
 

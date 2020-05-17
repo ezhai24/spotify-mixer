@@ -38,12 +38,18 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
     const session = await admin.firestore()
       .collection('sessions').doc(sessionId)
       .get();
+
+    if (!session.exists) {
+      res.status(404).send({
+        error: 'We could not find a session with this ID',
+      });
+    }
+
     const sessionUsers = session.get('users');
     if (sessionUsers.includes(user)) {
-      throw new functions.https.HttpsError(
-        'already-exists',
-        'A user with this name has already joined this session',
-      );
+      res.status(403).send({
+        error: 'A user with this name has already joined this session',
+      });
     }
 
     await admin.firestore()
