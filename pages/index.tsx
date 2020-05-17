@@ -4,10 +4,11 @@ import Cookies from 'js-cookie';
 import styled from '@emotion/styled';
 import Link from 'next/link';
 
-import { InputLabel, Input, PrimaryButton } from '~/components/Form';
+import { InputLabel, Input, InputError, PrimaryButton } from '~/components/Form';
 import { SPOTIFY_END_POINTS, SPOTIFY_STATE_KEY } from '~/shared/endpoints';
 import { SessionUser } from '~/shared/types';
 import { mq, colors } from '~/shared/styles';
+import { validateRequired } from '~/shared/validators';
 import routes from '~/shared/routes';
 
 enum FormType {
@@ -64,7 +65,7 @@ const Heading = styled.div({
     width: 250,
     margin: 0,
     fontSize: 72,
-    ':first-child': {
+    ':first-of-type': {
       textAlign: 'right',
     }
   },
@@ -77,7 +78,7 @@ const Heading = styled.div({
     h1: {      
       width: 'auto',
       fontSize: 64,
-      ':first-child, :last-child': {
+      ':first-of-type, :last-of-type': {
         textAlign: 'center',
       }
     }
@@ -116,7 +117,7 @@ const Footer = styled.div({
   p: {
     margin: 3,
     textAlign: 'center',
-    ':last-child': {
+    ':last-of-type': {
       color: colors.primary,
       textDecoration: 'underline',
       ':hover': {
@@ -132,12 +133,28 @@ const Footer = styled.div({
 const Home = () => {
   const [createFormValues, setCreateFormValues] = useState<SessionUser>({});
   const [joinFormValues, setJoinFormValues] = useState<SessionUser>({});
+  const [formErrors, setFormErrors] = useState({
+    createForm: {
+      displayName: [],
+    },
+    joinForm: {
+      displayName: [],
+      sessionId: [],
+    },
+  });
   const [hiddenForm, setHiddenForm] = useState(FormType.JOIN);
   const [submittedForm, setSubmittedForm] = useState(FormType.NONE);
 
   const handleCreateChange = (e) => {
     const key = e.target.name;
     const value = e.target.value;
+    setFormErrors(errors => ({
+      ...errors,
+      createForm: {
+        ...errors.createForm,
+        [key]: [],
+      },
+    }));
     setCreateFormValues(formValues => ({
       ...formValues,
       [key]: value,
@@ -147,6 +164,13 @@ const Home = () => {
   const handleJoinChange = (e) => {
     const key = e.target.name;
     const value = e.target.value;
+    setFormErrors(errors => ({
+      ...errors,
+      joinForm: {
+        ...errors.joinForm,
+        [key]: [],
+      },
+    }));
     setJoinFormValues(formValues => ({
       ...formValues,
       [key]: value,
@@ -155,11 +179,41 @@ const Home = () => {
 
   const submitCreateForm = (e) => {
     e.preventDefault();
+    const errors = validateRequired(
+      ['displayName'],
+      createFormValues as Record<string, string>,
+      formErrors.createForm,
+    );
+    if (Object.values(errors).some(errs => errs.length > 0)) {
+      setFormErrors(errorsState => ({
+        ...errorsState,
+        createForm: {
+          ...errorsState.createForm,
+          errors,
+        },
+      }));
+      return;
+    }
     setSubmittedForm(FormType.CREATE);
   };
 
   const submitJoinForm = (e) => {
     e.preventDefault();
+    const errors = validateRequired(
+      ['displayName', 'sessionId'],
+      joinFormValues as Record<string, string>,
+      formErrors.joinForm,
+    );
+    if (Object.values(errors).some(errs => errs.length > 0)) {
+      setFormErrors(errorsState => ({
+        ...errorsState,
+        joinForm: {
+          ...errorsState.joinForm,
+          errors,
+        },
+      }));
+      return;
+    }
     setSubmittedForm(FormType.JOIN);
   };
 
@@ -234,6 +288,7 @@ const Home = () => {
             value={ createFormValues.displayName || '' }
             onChange={ handleCreateChange }
           />
+          <InputError>{ formErrors.createForm.displayName }</InputError>
           <PrimaryButton onClick={ submitCreateForm }>CREATE</PrimaryButton>
         </Form>
 
@@ -245,6 +300,8 @@ const Home = () => {
             value={ joinFormValues.displayName || '' }
             onChange={ handleJoinChange }
           />
+          <InputError>{ formErrors.joinForm.displayName }</InputError>
+
           <InputLabel>SESSION CODE</InputLabel>
           <Input
             type="text"
@@ -252,6 +309,7 @@ const Home = () => {
             value={ joinFormValues.sessionId || '' }
             onChange={ handleJoinChange }
           />
+          <InputError>{ formErrors.joinForm.sessionId }</InputError>
           <PrimaryButton onClick={ submitJoinForm }>JOIN</PrimaryButton>
         </Form>
         

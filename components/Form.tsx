@@ -15,8 +15,14 @@ export const Input = styled.input({
   fontSize: 16,
 });
 
+export const InputError = styled.p({
+  margin: '5px 0 0',
+  color: 'red',
+  fontSize: 14,
+});
+
 export const PrimaryButton = styled.button({
-  marginTop: 25,
+  marginTop: 20,
   border: 'none',
   borderRadius: 20,
   backgroundColor: colors.primary,
