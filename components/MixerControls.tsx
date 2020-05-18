@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import styled from '@emotion/styled';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import { Loading, Modal} from '~/components';
 import { InputLabel, Input, InputError, Button } from '~/components/Form';
@@ -9,7 +10,7 @@ import { firestore } from '~/services/firebase';
 import { END_POINTS } from '~/shared/endpoints';
 import { SessionUser, Playlist } from '~/shared/types';
 import { validateRequired } from '~/shared/validators';
-import { colors } from '~/shared/styles';
+import { mq, colors } from '~/shared/styles';
 
 enum SaveStatus {
   OPEN,
@@ -29,6 +30,17 @@ const Header = styled.div({
     width: 200,
     marginTop: 40,
   },
+  'span:last-of-type:active': {
+    color: colors.secondaryText,
+  },
+  [mq[1]]: {
+    span: {
+      display: 'block',
+    },
+    button: {
+      width: '100%',
+    },
+  },
 });
 
 const Members = styled.div({
@@ -37,6 +49,9 @@ const Members = styled.div({
   padding: '30px 45px',
   backgroundColor: colors.backgroundDark,
   color: colors.secondaryText,
+  [mq[1]]: {
+    display: 'none',
+  },
 });
 
 const SongDetails = styled.div({
@@ -120,7 +135,12 @@ const MixerControls = (props: Props) => {
       <Header>
         <h1>{ currentUser.displayName }'s Session</h1>
         <span style={{ marginRight: 10 }}>Session Code:</span>
-        <span style={{ textDecoration: 'underline' }}>{ sessionId }</span>
+        <CopyToClipboard text={ sessionId }>
+          <span>
+            <u>{ sessionId }</u>
+            <img src="copy.svg" style={{ marginLeft: 5 }} />
+          </span>
+        </CopyToClipboard>
         <Button
           primary
           disabled={ sessionUsers.length < 1 }
@@ -154,8 +174,13 @@ const MixerControls = (props: Props) => {
 
                 { playlist.tracks.map(track => {
                   const { id, name, artists, albumName, duration } = track;
+
                   const songDuration = moment.duration(duration);
-                  const formattedDuration = songDuration.minutes() + ':' + songDuration.seconds();
+                  const seconds = songDuration.seconds() < 10
+                    ? '0' + songDuration.seconds()
+                    : songDuration.seconds();
+                  const formattedDuration = songDuration.minutes() + ':' + seconds;
+
                   return (
                     <div key={ id } style={{ margin: '30px 0' }}>
                       <div style={{ display: 'flex' }}>

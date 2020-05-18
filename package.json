@@ -21,6 +21,7 @@
     "querystring": "^0.2.0",
     "randomstring": "^1.1.5",
     "react": "16.13.1",
+    "react-copy-to-clipboard": "^5.0.2",
     "react-dom": "16.13.1",
     "react-spinners-kit": "^1.9.1"
   },
