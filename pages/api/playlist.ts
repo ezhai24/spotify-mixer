@@ -1,4 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import fetch from 'isomorphic-unfetch';
+
 import { firestore } from '~/services/firebase';
 import { SPOTIFY_END_POINTS, FIREBASE_END_POINTS } from '~/shared/endpoints';
 
@@ -33,7 +35,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         break;
       }
     }
-    console.log(seedArtists)
 
     // Use seeds to get recommendations from Spotify
     const getRecommendationsEndpoint = SPOTIFY_END_POINTS.getRecommendations({ seedArtists });

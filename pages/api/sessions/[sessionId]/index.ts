@@ -1,4 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import fetch from 'isomorphic-unfetch';
+
 import { FIREBASE_END_POINTS } from '~/shared/endpoints';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
