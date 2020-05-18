@@ -3,7 +3,9 @@ import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 
 import { RemovableListeners } from '~/pages/mixer';
+import { Loading } from '~/components';
 import { Button } from '~/components/Form';
+
 import { firestore } from '~/services/firebase';
 import { SessionUser } from '~/shared/types';
 import { END_POINTS } from '~/shared/endpoints';
@@ -36,6 +38,7 @@ const JoinConfirmation = (props: Props) => {
   const { sessionId, displayName } = currentUser;
 
   const [sessionIsRunning, setSessionIsRunning] = useState(true);
+  const [isLeaving, setIsLeaving] = useState(false);
 
   useEffect(() => {
     firestore.collection('sessions').doc(sessionId).onSnapshot(snapshot => {
@@ -46,6 +49,8 @@ const JoinConfirmation = (props: Props) => {
   });
 
   const leaveSession = async () => {
+    setIsLeaving(true);
+    
     const leaveSessionEndpoint = END_POINTS.leaveSession(sessionId, displayName);
     await fetch(leaveSessionEndpoint, {
       method: 'DELETE',
@@ -81,7 +86,7 @@ const JoinConfirmation = (props: Props) => {
           onClick={ leaveSession }
           style={{ width: 200, fontWeight: 'normal' }}
         >
-          Leave
+          { isLeaving ? <Loading /> : 'Leave' }
         </Button>
       }
     </PageContainer>
