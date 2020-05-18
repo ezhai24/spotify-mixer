@@ -1,16 +1,6 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, MouseEventHandler } from 'react';
 import styled from '@emotion/styled';
 import { colors } from '~/shared/styles';
-
-const ModalContainer = styled.div({
-  position: 'absolute',
-  top: 150,
-  left: '50%',
-  width: 500,
-  marginLeft: -280,
-  padding: '40px 30px',
-  backgroundColor: colors.background,
-});
 
 const ModalOverlay = styled.div({
   position: 'absolute',
@@ -20,18 +10,41 @@ const ModalOverlay = styled.div({
   width: '100%',
   backgroundColor: 'white',
   opacity: 0.3,
+  ':hover': {
+    cursor: 'pointer',
+  },
+});
+
+const ModalContainer = styled.div({
+  position: 'absolute',
+  top: 150,
+  left: '50%',
+  width: 500,
+  marginLeft: -280,
+  padding: '25px 30px 40px',
+  backgroundColor: colors.background,
+});
+
+const CloseButton = styled.img({
+  ':hover': {
+    cursor: 'pointer',
+  },
 });
 
 interface Props {
   children: string | ReactNode;
+  onClose: MouseEventHandler;
 }
 
 const Modal = (props: Props) => {
-  const { children } = props;
+  const { children, onClose } = props;
   return (
     <>
-      <ModalOverlay />
+      <ModalOverlay onClick={ onClose } />
       <ModalContainer>
+        <div style={{ marginBottom: 5, textAlign: 'right' }}>
+          <CloseButton src="close.svg" onClick={ onClose } />
+        </div>
         { children }
       </ModalContainer>
     </>

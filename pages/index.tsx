@@ -235,7 +235,7 @@ const Home = () => {
     isPrimaryUser: true,
   });
 
-  const authorizeSecondaryUser = (e) => authorizeUser({
+  const authorizeSecondaryUser = () => authorizeUser({
     ...joinFormValues,
     isPrimaryUser: false,
   });
