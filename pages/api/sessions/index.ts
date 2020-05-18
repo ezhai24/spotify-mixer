@@ -9,14 +9,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const user = "Zhai";
 
     const createSessionEndpoint = FIREBASE_END_POINTS.createSession();
-    const response = await fetch(createSessionEndpoint, {
+    await fetch(createSessionEndpoint, {
       method: 'POST',
       body: JSON.stringify({
         user,
       }),
     });
-    const session = await response.json();
-    res.send({ sessionId: session.sessionId });
+    // const response = await fetch(createSessionEndpoint, {
+    //   method: 'POST',
+    //   body: JSON.stringify({
+    //     user,
+    //   }),
+    // });
+    // const session = await response.json();
+    // res.send({ sessionId: session.sessionId });
+
+    res.send({ sessionId: 'aqMhQ6rDApjI0wVp1wL6' });
   }
 };
 
