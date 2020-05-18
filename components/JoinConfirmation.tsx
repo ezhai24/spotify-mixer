@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import styled from '@emotion/styled';
 
-import { RemovableListeners } from '~/pages/mixer';
 import { Loading } from '~/components';
 import { Button } from '~/components/Form';
 
@@ -13,7 +12,6 @@ import routes from '~/shared/routes';
 
 interface Props {
   currentUser: SessionUser;
-  listenersToRemove: RemovableListeners;
 }
 
 const PageContainer = styled.div({
@@ -34,7 +32,7 @@ const Message = styled.div({
 const JoinConfirmation = (props: Props) => {
   const router = useRouter();
 
-  const { currentUser, listenersToRemove } = props;
+  const { currentUser } = props;
   const { sessionId, displayName } = currentUser;
 
   const [sessionIsRunning, setSessionIsRunning] = useState(true);
@@ -50,15 +48,10 @@ const JoinConfirmation = (props: Props) => {
 
   const leaveSession = async () => {
     setIsLeaving(true);
-    
     const leaveSessionEndpoint = END_POINTS.leaveSession(sessionId, displayName);
     await fetch(leaveSessionEndpoint, {
       method: 'DELETE',
     });
-
-    window.removeEventListener('beforeunload', listenersToRemove.beforeunload);
-    window.removeEventListener('unload', listenersToRemove.unload);
-
     router.push(routes.home);
   };
   

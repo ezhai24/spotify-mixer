@@ -80,7 +80,7 @@ const MixerControls = (props: Props) => {
 
   useEffect(() => {
     firestore.collection('sessions').doc(sessionId).onSnapshot(snapshot => {
-      const { users, userCount } = snapshot.data();
+      const { users, userCount } = snapshot.data() || {};
       if (users && users.length !== sessionUsers.length && users.length === userCount) {
         setSessionUsers(users);
       };
@@ -212,7 +212,7 @@ const MixerControls = (props: Props) => {
 
       { saveStatus !== SaveStatus.CLOSED  &&
         <Modal onClose={ () => setSaveStatus(SaveStatus.CLOSED) }>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <form autoComplete="off" style={{ display: 'flex', flexDirection: 'column' }}>
             <InputLabel style={{ margin: 0, fontWeight: 'normal' }}>
               Playlist Name
             </InputLabel>
@@ -230,7 +230,7 @@ const MixerControls = (props: Props) => {
             >
               { saveStatus === SaveStatus.SAVING ? <Loading /> : 'SAVE' }
             </Button>
-          </div>
+          </form>
         </Modal>
       }
     </>

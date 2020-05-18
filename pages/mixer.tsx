@@ -18,15 +18,9 @@ const LoadingContainer = styled.div(({
   backgroundColor: isPrimaryUser ? colors.background : colors.backgroundLight,
 }));
 
-export interface RemovableListeners {
-  beforeunload: (this: Window, ev: BeforeUnloadEvent) => any;
-  unload: (this: Window, ev: Event) => any;
-}
-
 const Mixer = () => {
   const [currentUser, setCurrentUser] = useState<SessionUser>({});
   const [authError, setAuthError] = useState<string>();
-  const [listenersToRemove, setListenersToRemove] = useState<RemovableListeners>();
 
   const parseUser = () => {
     const user = querystring.parse(window.location.search.slice(1));
@@ -109,13 +103,12 @@ const Mixer = () => {
     };
     window.addEventListener('unload', onUnloadHandler);
 
-    setListenersToRemove({
-      beforeunload: beforeUnloadHandler,
-      unload: onUnloadHandler,
-    });
+    return { beforeUnloadHandler, onUnloadHandler }; 
   }
 
   useEffect(() => {
+    let listeners;
+
     const makeRequest = async () => {
       let user: SessionUser = parseUser();
       setCurrentUser(user);
@@ -123,7 +116,7 @@ const Mixer = () => {
         try {
           user = await createOrJoinSession(user);
           getUserTop(user);
-          addCleanupListeners(user);
+          listeners = addCleanupListeners(user);
           setCurrentUser(currentUser => ({ ...currentUser, ...user }));
         } catch (error) {
           setAuthError(error.message);
@@ -133,6 +126,14 @@ const Mixer = () => {
       }
     }
     makeRequest();
+
+    return function cleanup() {
+      if (listeners) {
+        const { beforeUnloadHandler, onUnloadHandler } = listeners;
+        window.removeEventListener('beforeunload', beforeUnloadHandler);
+        window.removeEventListener('unload', onUnloadHandler);
+      }
+    }
   }, []);
 
   if (authError) {
@@ -152,10 +153,7 @@ const Mixer = () => {
       { currentUser.isPrimaryUser ?
         <MixerControls currentUser={ currentUser } />
         :
-        <JoinConfirmation
-          currentUser={ currentUser }
-          listenersToRemove={ listenersToRemove }
-        />
+        <JoinConfirmation  currentUser={ currentUser } />
       }
     </>
   );
