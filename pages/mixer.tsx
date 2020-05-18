@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import styled from '@emotion/styled';
 import Cookies from 'js-cookie';
 import querystring from 'querystring';
 
@@ -6,6 +7,16 @@ import { Loading, ErrorPage, MixerControls, JoinConfirmation } from '~/component
 
 import { END_POINTS, FIREBASE_END_POINTS } from '~/shared/endpoints';
 import { SessionUser } from '~/shared/types';
+import { colors } from '~/shared/styles';
+
+const LoadingContainer = styled.div(({
+  isPrimaryUser,
+}: { isPrimaryUser: boolean }) => ({
+  height: '100%',
+  width: '100%',
+  paddingTop: 200,
+  backgroundColor: isPrimaryUser ? colors.background : colors.backgroundLight,
+}));
 
 export interface RemovableListeners {
   beforeunload: (this: Window, ev: BeforeUnloadEvent) => any;
@@ -107,6 +118,7 @@ const Mixer = () => {
   useEffect(() => {
     const makeRequest = async () => {
       let user: SessionUser = parseUser();
+      setCurrentUser(user);
       if (user) {
         try {
           user = await createOrJoinSession(user);
@@ -128,7 +140,11 @@ const Mixer = () => {
   }
 
   if (!currentUser.sessionId) {
-    return <Loading size='lg' style={{ marginTop: 200 }} />;
+    return (
+      <LoadingContainer isPrimaryUser={ currentUser.isPrimaryUser }>
+        <Loading size='lg' />
+      </LoadingContainer>
+    );
   }
 
   return (
