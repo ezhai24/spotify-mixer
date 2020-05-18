@@ -136,7 +136,12 @@ const Mixer = () => {
   }, []);
 
   if (authError) {
-    return <ErrorPage error={ authError } />;
+    return (
+      <ErrorPage
+        error={ authError }
+        listenersToRemove={ listenersToRemove }
+      />
+    );
   }
 
   if (!currentUser.sessionId) {

@@ -1,6 +1,6 @@
 import React, { ReactNode, MouseEventHandler } from 'react';
 import styled from '@emotion/styled';
-import { colors } from '~/shared/styles';
+import { mq, colors } from '~/shared/styles';
 
 const ModalOverlay = styled.div({
   position: 'absolute',
@@ -23,6 +23,10 @@ const ModalContainer = styled.div({
   marginLeft: -280,
   padding: '25px 30px 40px',
   backgroundColor: colors.background,
+  [mq[1]]: {
+    width: 250,
+    marginLeft: -155,
+  },
 });
 
 const CloseButton = styled.img({

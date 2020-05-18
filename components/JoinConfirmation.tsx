@@ -46,7 +46,7 @@ const JoinConfirmation = (props: Props) => {
         setSessionIsRunning(false);
       }
     });
-  });
+  }, []);
 
   const leaveSession = async () => {
     setIsLeaving(true);

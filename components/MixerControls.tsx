@@ -30,8 +30,13 @@ const Header = styled.div({
     width: 200,
     marginTop: 40,
   },
-  'span:last-of-type:active': {
-    color: colors.secondaryText,
+  'span:last-of-type': {
+    ':hover, :active': {
+      cursor: 'pointer',
+    },
+    ':active': {
+      color: colors.secondaryText,
+    },
   },
   [mq[1]]: {
     span: {
@@ -153,7 +158,13 @@ const MixerControls = (props: Props) => {
       <div style={{ display: 'flex', minHeight: 'calc(100% - 264px)' }}>
         <Members>
           <p>MEMBERS</p>
-          { sessionUsers.map(user => <div key={ user }>{ user }</div>) }
+          {
+            sessionUsers.map(user => (
+              <div key={ user } style={{ marginBottom: 8 }}>
+                { user }
+              </div>
+            ))
+          }
         </Members>
 
         <div style={{ flex: 1, padding: '30px 45px' }}>
