@@ -9,7 +9,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { query } = req;
     const { sessionId } = query;
 
-    // Get top counts from Firestore and convert to seeds
+    // Get top counts from Firestore
     const session = await firestore
       .collection('sessions').doc(sessionId as string)
       .get();
@@ -19,13 +19,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       .collection('topCounts').doc('aggregate')
       .get();
     const artistCounts = aggregate.get('artistCounts');
+    
+    // Find overlapping artists
     const seedArtists = [];
-    Object.keys(artistCounts).some((artist: string) => {
-      if (artistCounts[artist] === userCount) {
-        seedArtists.push(artist)
+    for (let threshold = userCount; threshold > 0; threshold--) {
+      const metLimit = Object.keys(artistCounts).some((artist: string) => {
+        if (artistCounts[artist] === threshold) {
+          seedArtists.push(artist)
+        }
+        return seedArtists.length === 5;
+      });
+      if (metLimit) {
+        break;
       }
-      return seedArtists.length === 5;
-    });
+    }
+    console.log(seedArtists)
 
     // Use seeds to get recommendations from Spotify
     const getRecommendationsEndpoint = SPOTIFY_END_POINTS.getRecommendations({ seedArtists });
