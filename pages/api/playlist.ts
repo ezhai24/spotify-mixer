@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import fetch from 'isomorphic-unfetch';
 
+import { spotifyFetch } from '~/services/spotify';
 import { firestore } from '~/services/firebase';
 import { SPOTIFY_END_POINTS, FIREBASE_END_POINTS } from '~/shared/endpoints';
 
@@ -38,11 +39,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // Use seeds to get recommendations from Spotify
     const getRecommendationsEndpoint = SPOTIFY_END_POINTS.getRecommendations({ seedArtists });
-    const response = await fetch(getRecommendationsEndpoint, {
-      headers: {
-        'Authorization': 'Bearer ' + req.cookies.accessToken,
-      },
-    });
+    const response = await spotifyFetch(req, res, getRecommendationsEndpoint);
     const recommendations = await response.json();
     const playlist = recommendations.tracks.map(track => ({
       id: track.id,
@@ -71,20 +68,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // Get the current user's Spotify ID
     const userDataEndpoint = SPOTIFY_END_POINTS.getUserData();
-    const userDataResponse = await fetch(userDataEndpoint, {
-      headers: {
-        'Authorization': 'Bearer ' + req.cookies.accessToken,
-      },
-    });
+    const userDataResponse = await spotifyFetch(req, res, userDataEndpoint);
     const { id: userId } = await userDataResponse.json();
 
     // Create an empty playlist
     const createPlaylistEndpoint = SPOTIFY_END_POINTS.createPlaylist(userId);
-    const playlistResponse = await fetch(createPlaylistEndpoint, {
+    const playlistResponse = await spotifyFetch(req, res, createPlaylistEndpoint, {
       method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + req.cookies.accessToken,
-      },
       body: JSON.stringify({
         name: playlistName,
       }),
@@ -93,11 +83,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // Add tracks to playlist
     const addToPlaylistEndpoint = SPOTIFY_END_POINTS.addToPlaylist(playlistId);
-    await fetch(addToPlaylistEndpoint, {
+    await spotifyFetch(req, res, addToPlaylistEndpoint, {
       method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + req.cookies.accessToken,
-      },
       body: JSON.stringify({
         uris: trackUris,
       }),
