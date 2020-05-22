@@ -9,6 +9,7 @@ interface RecommendationOptions {
 
 export const END_POINTS = {
   getToken: () => '/api/token',
+  dangerouslyGetToken: () => '/api/dangerousToken',
   createSession: () => '/api/sessions',
   joinSession: (sessionId: string) => `/api/sessions/${sessionId}`,
   leaveSession: (sessionId: string, displayName: string) => `/api/sessions/${sessionId}/users/${displayName}`,
