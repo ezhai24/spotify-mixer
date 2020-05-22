@@ -220,7 +220,7 @@ const Home = () => {
 
   const authorizeUser = (user: SessionUser) => {
     const scope = user.isPrimaryUser
-      ? 'user-top-read playlist-modify-public'
+      ? 'streaming user-read-email user-read-private user-top-read playlist-modify-public'
       : 'user-top-read';
     
     const stateSuffix = JSON.stringify(user);

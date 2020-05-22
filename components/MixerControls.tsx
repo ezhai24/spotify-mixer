@@ -7,6 +7,7 @@ import { Loading, Modal} from '~/components';
 import { InputLabel, Input, InputError, Button } from '~/components/Form';
 
 import { firestore } from '~/services/firebase';
+import { usePlaybackService } from '~/services/playback';
 import { END_POINTS } from '~/shared/endpoints';
 import { SessionUser, Playlist } from '~/shared/types';
 import { validateRequired } from '~/shared/validators';
@@ -69,6 +70,8 @@ interface Props {
 }
 
 const MixerControls = (props: Props) => {
+  const { setupPlayer } = usePlaybackService();
+
   const { currentUser } = props;
   const { sessionId } = currentUser;
 
@@ -79,6 +82,8 @@ const MixerControls = (props: Props) => {
   const [formErrors, setFormErrors] = useState({ name: [] });
 
   useEffect(() => {
+    setupPlayer();
+    
     firestore.collection('sessions').doc(sessionId).onSnapshot(snapshot => {
       const { users, userCount } = snapshot.data() || {};
       if (users && users.length !== sessionUsers.length && users.length === userCount) {
