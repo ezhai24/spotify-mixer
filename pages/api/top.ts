@@ -15,7 +15,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const response = await spotifyFetch(req, res, getTopArtistsEndpoint);
     const topArtists = await response.json();
 
-    console.log(sessionId, displayName, topArtists)
+    const debugArtists = topArtists.map(artist => artist.id);
+    console.log('session id: ', sessionId)
+    console.log('name: ', displayName);
+    console.log('top artists: ', debugArtists);
 
     // Save top tracks to Firebase
     const artists = topArtists.items.map(artist => artist.id);
