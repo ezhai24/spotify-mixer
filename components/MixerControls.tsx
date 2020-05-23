@@ -120,16 +120,26 @@ const MixerControls = (props: Props) => {
   };
 
   const playPlaylist = async () => {
-    const trackUris = playlist.tracks.map(track => track.uri);
-    const playEndpoint = END_POINTS.play();
-    const { _options: { id } } = player as any;
-    await fetch(playEndpoint, {
-      method: 'PUT',
-      body: JSON.stringify({
-        deviceId: id,
-        tracks: trackUris,
-      }),
-    });
+    if (!player.currentTrack) {
+      const trackUris = playlist.tracks.map(track => track.uri);
+      const playEndpoint = END_POINTS.play();
+      const { _options: { id } } = player.instance as any;
+      await fetch(playEndpoint, {
+        method: 'PUT',
+        body: JSON.stringify({
+          deviceId: id,
+          tracks: trackUris,
+        }),
+      });
+    } else {
+      await player.instance.resume();
+    }
+  };
+
+  const pausePlaylist = async () => {
+    if (player.instance) {
+      await player.instance.pause();
+    }
   };
 
   const handlePlaylistChange = (e) => {
@@ -209,7 +219,16 @@ const MixerControls = (props: Props) => {
               <>
                 <div style={{ display: 'flex' }}>
                   { currentUser.spotifySubscriptionLevel === 'premium' &&
-                    <PlayButton src="play.svg" onClick={ playPlaylist } />
+                    <PlayButton
+                      src={ !player.currentTrack || player.currentTrack.paused
+                        ? "play.svg"
+                        : "pause.svg"
+                      }
+                      onClick={ !player.currentTrack || player.currentTrack.paused
+                        ? playPlaylist
+                        : pausePlaylist
+                      }
+                    />
                   }
                   { playlist.url ?
                     <a href={ playlist.url } target="_blank" rel="noopener noreferrer">
@@ -225,7 +244,7 @@ const MixerControls = (props: Props) => {
                 </div>
 
                 { playlist.tracks.map(track => {
-                  const { id, name, artists, albumName, duration } = track;
+                  const { id, uri, name, artists, albumName, duration } = track;
 
                   const songDuration = moment.duration(duration);
                   const seconds = songDuration.seconds() < 10
@@ -233,14 +252,20 @@ const MixerControls = (props: Props) => {
                     : songDuration.seconds();
                   const formattedDuration = songDuration.minutes() + ':' + seconds;
 
+                  const isPlaying = player.currentTrack && (uri === player.currentTrack.uri);
+
                   return (
-                    <div key={ id } style={{ margin: '30px 0' }}>
-                      <div style={{ display: 'flex' }}>
-                        <div style={{ flex: 1 }}>{ name }</div>
-                        <SongDetails>{ formattedDuration }</SongDetails>
+                    <div key={ id } style={{ display: 'flex', margin: '30px 0' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ color: isPlaying && colors.primary }}>
+                          { name }
+                        </div>
+                        <SongDetails>
+                          { artists.join(', ') } &middot; { albumName }               
+                        </SongDetails>
                       </div>
-                      <SongDetails>
-                        { artists.join(', ') } &middot; { albumName }               
+                      <SongDetails style={{ color: isPlaying && colors.primary }}>
+                        { formattedDuration }
                       </SongDetails>
                     </div>
                   );

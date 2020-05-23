@@ -1,14 +1,22 @@
 import React, { createContext, useContext, useState } from 'react';
 import { END_POINTS } from '~/shared/endpoints';
 
+interface PlaybackMap {
+  instance?: Spotify.SpotifyPlayer;
+  currentTrack?: {
+    uri: string;
+    paused: boolean;
+  };
+}
+
 type PlaybackContextType = [
-  Spotify.SpotifyPlayer | undefined,
-  React.Dispatch<React.SetStateAction<Spotify.SpotifyPlayer>>,
+  PlaybackMap,
+  React.Dispatch<React.SetStateAction<PlaybackMap>>,
 ];
 const PlaybackContext = createContext<PlaybackContextType>([undefined, () => {}]);
 
 export const usePlaybackService = (): {
-  player: Spotify.SpotifyPlayer;
+  player: PlaybackMap;
   setupPlayer: () => void;
 } => {
   const [player, setPlayer] = useContext(PlaybackContext);
@@ -23,8 +31,19 @@ export const usePlaybackService = (): {
         callback(accessToken);
       },
     });
+
     spotifyPlayer.connect();
-    setPlayer(spotifyPlayer);
+    spotifyPlayer.addListener('player_state_changed', state => {
+      setPlayer(currentPlayer => ({
+        ...currentPlayer,
+        currentTrack: {
+          uri: state.track_window.current_track.uri,
+          paused: state.paused,
+        },
+      }));
+    });
+
+    setPlayer({ instance: spotifyPlayer });
   };
 
   return { player, setupPlayer };
@@ -35,7 +54,7 @@ interface Props {
 }
 
 const PlaybackProvider = ({ children }: Props) => {
-  const contextStateHooks = useState<Spotify.SpotifyPlayer>();
+  const contextStateHooks = useState<PlaybackMap>({});
 
   return (
     <PlaybackContext.Provider value={ contextStateHooks }>
