@@ -42,12 +42,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     const { access_token, refresh_token, expires_in } = await response.json();
-    const expires_at = moment((new Date()).toISOString()).add(expires_in, 's');
+    const expiresAt = moment().add(expires_in, 's').toDate();
 
     res.setHeader('Set-Cookie', [
       cookie.serialize('accessToken', access_token, { httpOnly: true }),
       cookie.serialize('refreshToken', refresh_token, { httpOnly: true }),
-      cookie.serialize('expiresAt', expires_at, { httpOnly: true }),
+      cookie.serialize('expires', expiresAt, { httpOnly: true }),
     ]);
 
     const userParams = JSON.parse((state as string).slice(16));

@@ -10,7 +10,6 @@ import { SessionUser } from '~/shared/types';
 import { mq, colors } from '~/shared/styles';
 import { validateRequired } from '~/shared/validators';
 import routes from '~/shared/routes';
-import { route } from 'next/dist/next-server/server/router';
 
 enum FormType {
   NONE,
@@ -220,12 +219,7 @@ const Home = () => {
 
   const authorizeUser = (user: SessionUser) => {
     const scope = user.isPrimaryUser
-      ? `streaming
-        user-modify-playback-state
-        user-read-email
-        user-read-private
-        user-top-read
-        playlist-modify-public`
+      ? 'user-top-read playlist-modify-public'
       : 'user-top-read';
     
     const stateSuffix = JSON.stringify(user);
@@ -273,7 +267,7 @@ const Home = () => {
           <img src="infoCircle.svg" />
         </Link>
         <a
-          href={ routes.github }
+          href="https://github.com/ezhai24/spotify-mixer"
           target="_blank"
           rel="noopener noreferrer"
         >
