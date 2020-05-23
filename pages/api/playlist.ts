@@ -43,6 +43,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const recommendations = await response.json();
     const playlist = recommendations.tracks.map(track => ({
       id: track.id,
+      uri: track.uri,
       name: track.name,
       duration: track.duration_ms,
       albumName: track.album.name,

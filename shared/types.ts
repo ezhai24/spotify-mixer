@@ -14,6 +14,7 @@ export interface SessionUser {
 
 interface Track {
   id: string,
+  uri: string,
   name: string,
   artists: string[],
   albumName: string,

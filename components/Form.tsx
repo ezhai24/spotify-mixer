@@ -24,6 +24,7 @@ export const InputError = styled.p({
 export const Button = styled.button(({
   primary,
 }: { primary?: boolean }) => ({
+  height: 35,
   marginTop: 20,
   border: primary ? 'none' : `2px solid ${colors.primary}`,
   borderRadius: 20,

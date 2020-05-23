@@ -16,6 +16,7 @@ export const END_POINTS = {
   saveTop: () => '/api/top',
   generatePlaylist: (sessionId: string) => `/api/playlist?sessionId=${sessionId}`,
   savePlaylist: () => '/api/playlist',
+  play: () => '/api/playback/play',
 };
 
 export const FIREBASE_END_POINTS = {
@@ -48,4 +49,5 @@ export const SPOTIFY_END_POINTS = {
     }),
   createPlaylist: (userId: string) => `https://api.spotify.com/v1/users/${userId}/playlists`,
   addToPlaylist: (playlistId: string) => `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+  play: (deviceId: string) => `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
 };

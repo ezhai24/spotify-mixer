@@ -60,6 +60,24 @@ const Members = styled.div({
   },
 });
 
+const PlayButton = styled.img({
+  height: 35,
+  marginRight: 15,
+  ':hover': {
+    cursor: 'pointer',
+    transform: 'scale(1.1)',
+  }
+});
+
+const ViewSaveButton = styled(Button)({
+  width: 200,
+  marginTop: 0,
+  [mq[1]]: {
+    flex: 1,
+    width: 'auto',
+  },
+});
+
 const SongDetails = styled.div({
   color: colors.secondaryText,
   fontSize: 14,
@@ -70,7 +88,7 @@ interface Props {
 }
 
 const MixerControls = (props: Props) => {
-  const { setupPlayer } = usePlaybackService();
+  const { player, setupPlayer } = usePlaybackService();
 
   const { currentUser } = props;
   const { sessionId } = currentUser;
@@ -99,6 +117,19 @@ const MixerControls = (props: Props) => {
     const tracks = await response.json();
     setPlaylist(playlist => ({ ...playlist, tracks, url: null }));
     setIsGenerating(false);
+  };
+
+  const playPlaylist = async () => {
+    const trackUris = playlist.tracks.map(track => track.uri);
+    const playEndpoint = END_POINTS.play();
+    const { _options: { id } } = player as any;
+    await fetch(playEndpoint, {
+      method: 'PUT',
+      body: JSON.stringify({
+        deviceId: id,
+        tracks: trackUris,
+      }),
+    });
   };
 
   const handlePlaylistChange = (e) => {
@@ -175,18 +206,20 @@ const MixerControls = (props: Props) => {
         <div style={{ flex: 1, padding: '30px 45px' }}>
           { playlist.tracks.length > 0 ?
               <>
-                { playlist.url ?
-                  <a href={ playlist.url } target="_blank" rel="noopener noreferrer">
-                    <Button style={{ width: 200 }}>VIEW IN SPOTIFY</Button>
-                  </a>
-                :
-                  <Button
-                    onClick={ () => setSaveStatus(SaveStatus.OPEN) }
-                    style={{ width: 200 }}
-                  >
-                    SAVE TO SPOTIFY
-                  </Button>
-                }
+                <div style={{ display: 'flex' }}>
+                  <PlayButton src="play.svg" onClick={ playPlaylist } />
+                  { playlist.url ?
+                    <a href={ playlist.url } target="_blank" rel="noopener noreferrer">
+                      <ViewSaveButton>VIEW IN SPOTIFY</ViewSaveButton>
+                    </a>
+                  :
+                    <ViewSaveButton
+                      onClick={ () => setSaveStatus(SaveStatus.OPEN) }
+                    >
+                      SAVE TO SPOTIFY
+                    </ViewSaveButton>
+                  }
+                </div>
 
                 { playlist.tracks.map(track => {
                   const { id, name, artists, albumName, duration } = track;
