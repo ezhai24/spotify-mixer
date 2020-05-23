@@ -17,9 +17,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     
     // Save top tracks to Firebase
     const artists = topArtists.items.map(artist => artist.id);
-    console.log(artists)
     const addTopCountsEndpoint = FIREBASE_END_POINTS.addTopCounts();
-    const addTopResponse = await fetch(addTopCountsEndpoint, {
+    fetch(addTopCountsEndpoint, {
       method: 'POST',
       body: JSON.stringify({
         sessionId,
@@ -27,7 +26,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         artists,
       }),
     });
-    console.log(response)
 
     res.end();
   }
