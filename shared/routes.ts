@@ -3,4 +3,5 @@ export default {
   mixer: '/mixer',
   about: '/about',
   github: 'https://github.com/ezhai24/spotify-mixer',
+  faLicense: 'https://fontawesome.com/license',
 };
