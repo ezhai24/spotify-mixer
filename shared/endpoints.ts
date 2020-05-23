@@ -17,7 +17,7 @@ export const END_POINTS = {
   saveTop: () => '/api/top',
   generatePlaylist: (sessionId: string) => `/api/playlist?sessionId=${sessionId}`,
   savePlaylist: () => '/api/playlist',
-  play: () => '/api/playback/play',
+  play: () => '/api/playback',
 };
 
 export const FIREBASE_END_POINTS = {
