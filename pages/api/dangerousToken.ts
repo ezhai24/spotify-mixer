@@ -15,7 +15,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { cookies } = req;
     const { accessToken, refreshToken, expiresAt } = cookies;
 
-    if (moment().isAfter(moment(expiresAt))) {
+    if (moment().isAfter(expiresAt)) {
       const tokenEndpoint = SPOTIFY_END_POINTS.getToken();
       const response = await fetch(tokenEndpoint, {
         method: 'POST',
@@ -30,7 +30,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       });
 
       const { access_token, refresh_token, expires_in } = await response.json();
-      const expires_at = moment().add(expires_in, 's').toDate();
+      const expires_at = moment().add(expires_in, 's');
 
       res.setHeader('Set-Cookie', [
         cookie.serialize('accessToken', access_token, { httpOnly: true }),
