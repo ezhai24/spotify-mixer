@@ -7,6 +7,7 @@ import { Loading, Modal} from '~/components';
 import { InputLabel, Input, InputError, Button } from '~/components/Form';
 
 import { firestore } from '~/services/firebase';
+import { usePlaybackService } from '~/services/playback';
 import { END_POINTS } from '~/shared/endpoints';
 import { SessionUser, Playlist } from '~/shared/types';
 import { validateRequired } from '~/shared/validators';
@@ -59,6 +60,24 @@ const Members = styled.div({
   },
 });
 
+const PlayButton = styled.img({
+  height: 35,
+  marginRight: 15,
+  ':hover': {
+    cursor: 'pointer',
+    transform: 'scale(1.1)',
+  }
+});
+
+const ViewSaveButton = styled(Button)({
+  width: 200,
+  marginTop: 0,
+  [mq[1]]: {
+    flex: 1,
+    width: 'auto',
+  },
+});
+
 const SongDetails = styled.div({
   color: colors.secondaryText,
   fontSize: 14,
@@ -69,6 +88,8 @@ interface Props {
 }
 
 const MixerControls = (props: Props) => {
+  const { player, setupPlayer } = usePlaybackService();
+
   const { currentUser } = props;
   const { sessionId } = currentUser;
 
@@ -79,6 +100,8 @@ const MixerControls = (props: Props) => {
   const [formErrors, setFormErrors] = useState({ name: [] });
 
   useEffect(() => {
+    setupPlayer();
+    
     firestore.collection('sessions').doc(sessionId).onSnapshot(snapshot => {
       const { users, userCount } = snapshot.data() || {};
       if (users && users.length !== sessionUsers.length && users.length === userCount) {
@@ -94,6 +117,29 @@ const MixerControls = (props: Props) => {
     const tracks = await response.json();
     setPlaylist(playlist => ({ ...playlist, tracks, url: null }));
     setIsGenerating(false);
+  };
+
+  const playPlaylist = async () => {
+    if (!player.currentTrack) {
+      const trackUris = playlist.tracks.map(track => track.uri);
+      const playEndpoint = END_POINTS.play();
+      const { _options: { id } } = player.instance as any;
+      await fetch(playEndpoint, {
+        method: 'PUT',
+        body: JSON.stringify({
+          deviceId: id,
+          tracks: trackUris,
+        }),
+      });
+    } else {
+      await player.instance.resume();
+    }
+  };
+
+  const pausePlaylist = async () => {
+    if (player.instance) {
+      await player.instance.pause();
+    }
   };
 
   const handlePlaylistChange = (e) => {
@@ -123,6 +169,7 @@ const MixerControls = (props: Props) => {
     const response = await fetch(savePlaylistEndpoint, {
       method: 'POST',
       body: JSON.stringify({
+        spotifyUserId: currentUser.spotifyUserId,
         name: playlist.name,
         trackUris: playlist.tracks.map(track => `spotify:track:${track.id}`),
       }),
@@ -170,21 +217,34 @@ const MixerControls = (props: Props) => {
         <div style={{ flex: 1, padding: '30px 45px' }}>
           { playlist.tracks.length > 0 ?
               <>
-                { playlist.url ?
-                  <a href={ playlist.url } target="_blank" rel="noopener noreferrer">
-                    <Button style={{ width: 200 }}>VIEW IN SPOTIFY</Button>
-                  </a>
-                :
-                  <Button
-                    onClick={ () => setSaveStatus(SaveStatus.OPEN) }
-                    style={{ width: 200 }}
-                  >
-                    SAVE TO SPOTIFY
-                  </Button>
-                }
+                <div style={{ display: 'flex' }}>
+                  { currentUser.spotifySubscriptionLevel === 'premium' &&
+                    <PlayButton
+                      src={ !player.currentTrack || player.currentTrack.paused
+                        ? "play.svg"
+                        : "pause.svg"
+                      }
+                      onClick={ !player.currentTrack || player.currentTrack.paused
+                        ? playPlaylist
+                        : pausePlaylist
+                      }
+                    />
+                  }
+                  { playlist.url ?
+                    <a href={ playlist.url } target="_blank" rel="noopener noreferrer">
+                      <ViewSaveButton>VIEW IN SPOTIFY</ViewSaveButton>
+                    </a>
+                  :
+                    <ViewSaveButton
+                      onClick={ () => setSaveStatus(SaveStatus.OPEN) }
+                    >
+                      SAVE TO SPOTIFY
+                    </ViewSaveButton>
+                  }
+                </div>
 
                 { playlist.tracks.map(track => {
-                  const { id, name, artists, albumName, duration } = track;
+                  const { id, uri, name, artists, albumName, duration } = track;
 
                   const songDuration = moment.duration(duration);
                   const seconds = songDuration.seconds() < 10
@@ -192,14 +252,20 @@ const MixerControls = (props: Props) => {
                     : songDuration.seconds();
                   const formattedDuration = songDuration.minutes() + ':' + seconds;
 
+                  const isPlaying = player.currentTrack && (uri === player.currentTrack.uri);
+
                   return (
-                    <div key={ id } style={{ margin: '30px 0' }}>
-                      <div style={{ display: 'flex' }}>
-                        <div style={{ flex: 1 }}>{ name }</div>
-                        <SongDetails>{ formattedDuration }</SongDetails>
+                    <div key={ id } style={{ display: 'flex', margin: '30px 0' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ color: isPlaying && colors.primary }}>
+                          { name }
+                        </div>
+                        <SongDetails>
+                          { artists.join(', ') } &middot; { albumName }               
+                        </SongDetails>
                       </div>
-                      <SongDetails>
-                        { artists.join(', ') } &middot; { albumName }               
+                      <SongDetails style={{ color: isPlaying && colors.primary }}>
+                        { formattedDuration }
                       </SongDetails>
                     </div>
                   );

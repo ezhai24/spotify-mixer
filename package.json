@@ -28,6 +28,8 @@
   "devDependencies": {
     "@types/node": "^13.13.4",
     "@types/react": "^16.9.34",
+    "@types/spotify-api": "^0.0.3",
+    "@types/spotify-web-playback-sdk": "^0.1.7",
     "dotenv-webpack": "^1.7.0",
     "typescript": "^3.8.3",
     "use-yarn": "^2.2.0"

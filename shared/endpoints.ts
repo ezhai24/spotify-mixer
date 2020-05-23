@@ -9,12 +9,15 @@ interface RecommendationOptions {
 
 export const END_POINTS = {
   getToken: () => '/api/token',
+  dangerouslyGetToken: () => '/api/dangerousToken',
   createSession: () => '/api/sessions',
   joinSession: (sessionId: string) => `/api/sessions/${sessionId}`,
   leaveSession: (sessionId: string, displayName: string) => `/api/sessions/${sessionId}/users/${displayName}`,
+  getSpotifyUser: () => '/api/spotifyUser',
   saveTop: () => '/api/top',
   generatePlaylist: (sessionId: string) => `/api/playlist?sessionId=${sessionId}`,
   savePlaylist: () => '/api/playlist',
+  play: () => '/api/playback',
 };
 
 export const FIREBASE_END_POINTS = {
@@ -47,4 +50,5 @@ export const SPOTIFY_END_POINTS = {
     }),
   createPlaylist: (userId: string) => `https://api.spotify.com/v1/users/${userId}/playlists`,
   addToPlaylist: (playlistId: string) => `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+  play: (deviceId: string) => `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
 };

@@ -4,29 +4,21 @@ import cookie from 'cookie';
 import moment from 'moment';
 import querystring from 'querystring';
 
-import {
-  SPOTIFY_END_POINTS,
-  REDIRECT_URI,
-  SPOTIFY_STATE_KEY,
-} from '~/shared/endpoints';
-import routes from '~/shared/routes';
+import { SPOTIFY_END_POINTS } from '~/shared/endpoints';
 
 const clientId = process.env.SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { method } = req;
-  if (method === 'GET') {
-    const { query, cookies } = req;
-    
-    const { code, state } = query;
-    const storedState = cookies[SPOTIFY_STATE_KEY];
-    if (!code || state !== storedState) {
-      const redirectUrl = process.env.HOST + routes.home;
-      res.writeHead(302, { Location: redirectUrl });
-      res.end();
-    }
+export const spotifyFetch = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  url: string,
+  options: RequestInit = {},
+) => {
+  const { cookies } = req;
+  const { accessToken, refreshToken, expiresAt } = cookies;
 
+  if (moment((new Date()).toISOString()).isAfter(expiresAt)) {
     const tokenEndpoint = SPOTIFY_END_POINTS.getToken();
     const response = await fetch(tokenEndpoint, {
       method: 'POST',
@@ -35,9 +27,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         'Content-type': 'application/x-www-form-urlencoded',
       },
       body: querystring.stringify({
-        redirect_uri: REDIRECT_URI,
-        grant_type: 'authorization_code',
-        code,
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
       }),
     });
 
@@ -50,11 +41,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       cookie.serialize('expiresAt', expires_at, { httpOnly: true }),
     ]);
 
-    const userParams = JSON.parse((state as string).slice(16));
-    const redirectUrl = process.env.HOST + routes.mixer + '?' + querystring.stringify(userParams);
-    res.writeHead(302, { Location: redirectUrl });
-    res.end();
+    return fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        'Authorization': 'Bearer ' + access_token,
+      },
+    });
   }
-};
 
-export default handler;
+  return fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      'Authorization': 'Bearer ' + accessToken,
+    },
+  });
+};
