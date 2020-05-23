@@ -18,7 +18,7 @@ export const spotifyFetch = async (
   const { cookies } = req;
   const { accessToken, refreshToken, expiresAt } = cookies;
 
-  if (moment((new Date()).toISOString()).isAfter(expiresAt)) {
+  if (moment().isAfter(moment(expiresAt))) {
     const tokenEndpoint = SPOTIFY_END_POINTS.getToken();
     const response = await fetch(tokenEndpoint, {
       method: 'POST',
@@ -32,12 +32,11 @@ export const spotifyFetch = async (
       }),
     });
 
-    const { access_token, refresh_token, expires_in } = await response.json();
-    const expires_at = moment((new Date()).toISOString()).add(expires_in, 's');
+    const { access_token, expires_in } = await response.json();
+    const expires_at = moment().add(expires_in, 's').toISOString();
 
     res.setHeader('Set-Cookie', [
       cookie.serialize('accessToken', access_token, { httpOnly: true }),
-      cookie.serialize('refreshToken', refresh_token, { httpOnly: true }),
       cookie.serialize('expiresAt', expires_at, { httpOnly: true }),
     ]);
 
