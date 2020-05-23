@@ -7,7 +7,7 @@ const App = ({ Component, pageProps }) => {
     window.onSpotifyWebPlaybackSDKReady = () => {
       window.Spotify = Spotify;
     };
-  });
+  }, []);
 
   return (
     <>
