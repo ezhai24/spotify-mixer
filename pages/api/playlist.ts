@@ -52,7 +52,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // Save playlist to Firestore
     const createPlaylistEndpoint = FIREBASE_END_POINTS.createPlaylist();
-    fetch(createPlaylistEndpoint, {
+    await fetch(createPlaylistEndpoint, {
       method: 'POST',
       body: JSON.stringify({
         sessionId,
