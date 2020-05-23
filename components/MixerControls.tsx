@@ -159,6 +159,7 @@ const MixerControls = (props: Props) => {
     const response = await fetch(savePlaylistEndpoint, {
       method: 'POST',
       body: JSON.stringify({
+        spotifyUserId: currentUser.spotifyUserId,
         name: playlist.name,
         trackUris: playlist.tracks.map(track => `spotify:track:${track.id}`),
       }),
@@ -207,7 +208,9 @@ const MixerControls = (props: Props) => {
           { playlist.tracks.length > 0 ?
               <>
                 <div style={{ display: 'flex' }}>
-                  <PlayButton src="play.svg" onClick={ playPlaylist } />
+                  { currentUser.spotifySubscriptionLevel === 'premium' &&
+                    <PlayButton src="play.svg" onClick={ playPlaylist } />
+                  }
                   { playlist.url ?
                     <a href={ playlist.url } target="_blank" rel="noopener noreferrer">
                       <ViewSaveButton>VIEW IN SPOTIFY</ViewSaveButton>

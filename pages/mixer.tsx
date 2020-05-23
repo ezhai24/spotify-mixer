@@ -68,8 +68,15 @@ const Mixer = () => {
     return user;
   };
 
+  const getSpotifyUser = async (user: SessionUser) => {
+    const spotifyUserEndpoint = END_POINTS.getSpotifyUser();
+    const response = await fetch(spotifyUserEndpoint);
+    const spotifyUser = await response.json();
+    return { ...user, ...spotifyUser };
+  };
+
   const getUserTop = async (user: SessionUser) => {
-    const topEndpoint = END_POINTS.saveTop()
+    const topEndpoint = END_POINTS.saveTop();
     await fetch(topEndpoint, {
       method: 'POST',
       body: JSON.stringify(user),
@@ -115,7 +122,8 @@ const Mixer = () => {
       if (user) {
         try {
           user = await createOrJoinSession(user);
-          getUserTop(user);
+          user = await getSpotifyUser(user);
+          await getUserTop(user);
           listeners = addCleanupListeners(user);
           setCurrentUser(currentUser => ({ ...currentUser, ...user }));
         } catch (error) {

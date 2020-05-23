@@ -13,6 +13,7 @@ export const END_POINTS = {
   createSession: () => '/api/sessions',
   joinSession: (sessionId: string) => `/api/sessions/${sessionId}`,
   leaveSession: (sessionId: string, displayName: string) => `/api/sessions/${sessionId}/users/${displayName}`,
+  getSpotifyUser: () => '/api/spotifyUser',
   saveTop: () => '/api/top',
   generatePlaylist: (sessionId: string) => `/api/playlist?sessionId=${sessionId}`,
   savePlaylist: () => '/api/playlist',

@@ -65,15 +65,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (method === 'POST') {
     const { body } = req;
-    const { name: playlistName, trackUris } = JSON.parse(body);
-
-    // Get the current user's Spotify ID
-    const userDataEndpoint = SPOTIFY_END_POINTS.getUserData();
-    const userDataResponse = await spotifyFetch(req, res, userDataEndpoint);
-    const { id: userId } = await userDataResponse.json();
+    const { spotifyUserId, name: playlistName, trackUris } = JSON.parse(body);
 
     // Create an empty playlist
-    const createPlaylistEndpoint = SPOTIFY_END_POINTS.createPlaylist(userId);
+    const createPlaylistEndpoint = SPOTIFY_END_POINTS.createPlaylist(spotifyUserId);
     const playlistResponse = await spotifyFetch(req, res, createPlaylistEndpoint, {
       method: 'POST',
       body: JSON.stringify({

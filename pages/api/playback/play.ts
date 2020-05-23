@@ -10,13 +10,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { deviceId, tracks } = JSON.parse(body);
     
     const playEndpoint = SPOTIFY_END_POINTS.play(deviceId);
-    const response = await spotifyFetch(req, res, playEndpoint, {
+    await spotifyFetch(req, res, playEndpoint, {
       method: 'PUT',
       body: JSON.stringify({
         uris: tracks,
       }),
     });
-    console.log(response)
 
     res.end();
   }

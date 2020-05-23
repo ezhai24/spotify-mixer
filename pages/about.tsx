@@ -70,9 +70,13 @@ const About = () => {
       </p>
       <h3>Step 4 &ndash; Play it, save it, tweak it</h3>
       <p>
-        From here, you can play the songs just like you would in Spotify. Or, for a more 
-        full-featured experience, save the playlist to Spotify and continue to add, remove, 
-        reorder, and remix until it's perfect.
+        From here, you can listen to the playlist directly from Spotify Mixer if you have 
+        a Spotify Premium account. For a more fully-featured experience, save the playlist 
+        to Spotify and continue to add, remove, reorder, and remix until it's perfect.
+      </p>
+      <p>
+        If you don't have a Premium account, fear not. You can still save the playlist 
+        to your Spotify library and listen to and modify it there.
       </p>
 
       <h2>How does it work?</h2>

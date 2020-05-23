@@ -10,6 +10,8 @@ export interface SessionUser {
   displayName?: string;
   sessionId?: string;
   auth?: UserAuth;
+  spotifyUserId?: string,
+  spotifySubscriptionLevel?: string;
 };
 
 interface Track {
