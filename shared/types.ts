@@ -27,4 +27,5 @@ export interface Playlist {
   name?: string;
   tracks: Track[];
   url?: string;
+  isPostedToPlayer?: boolean;
 }

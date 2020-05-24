@@ -112,15 +112,21 @@ const MixerControls = (props: Props) => {
 
   const generatePlaylist = async () => {
     setIsGenerating(true);
+    await player.instance.pause();
     const generatePlaylistEndpoint = END_POINTS.generatePlaylist(sessionId);
     const response = await fetch(generatePlaylistEndpoint);
     const tracks = await response.json();
-    setPlaylist(playlist => ({ ...playlist, tracks, url: null }));
+    setPlaylist(currentPlaylist => ({
+      ...currentPlaylist,
+      tracks,
+      url: null,
+      isPostedToPlayer: false,
+    }));
     setIsGenerating(false);
   };
 
   const playPlaylist = async () => {
-    if (!player.currentTrack) {
+    if (!playlist.isPostedToPlayer) {
       const trackUris = playlist.tracks.map(track => track.uri);
       const playEndpoint = END_POINTS.play();
       const { _options: { id } } = player.instance as any;
@@ -131,6 +137,10 @@ const MixerControls = (props: Props) => {
           tracks: trackUris,
         }),
       });
+      setPlaylist(currentPlaylist => ({
+        ...currentPlaylist,
+        isPostedToPlayer: true,
+      }));
     } else {
       await player.instance.resume();
     }
@@ -145,8 +155,8 @@ const MixerControls = (props: Props) => {
   const handlePlaylistChange = (e) => {
     const key = e.target.name;
     const value = e.target.value;
-    setPlaylist(playlist => ({
-      ...playlist,
+    setPlaylist(currentPlaylist => ({
+      ...currentPlaylist,
       [key]: value,
     }));
   };
@@ -175,8 +185,8 @@ const MixerControls = (props: Props) => {
       }),
     });
     const playlistData = await response.json();
-    setPlaylist(playlist => ({
-      ...playlist,
+    setPlaylist(currentPlaylist => ({
+      ...currentPlaylist,
       url: playlistData.playlistUrl,
     }));
     setSaveStatus(SaveStatus.CLOSED);
