@@ -122,9 +122,9 @@ const Mixer = () => {
       if (user) {
         try {
           user = await createOrJoinSession(user);
+          listeners = addCleanupListeners(user);
           user = await getSpotifyUser(user);
           getUserTop(user);
-          listeners = addCleanupListeners(user);
           setCurrentUser(currentUser => ({ ...currentUser, ...user }));
         } catch (error) {
           setAuthError(error.message);
