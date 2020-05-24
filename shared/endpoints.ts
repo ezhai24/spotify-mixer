@@ -7,6 +7,9 @@ interface RecommendationOptions {
   seedArtists: string[];
 }
 
+/**
+ * Spotify Mixer API Endpoints
+ */
 export const END_POINTS = {
   getToken: () => '/api/token',
   dangerouslyGetToken: () => '/api/dangerousToken',
@@ -20,15 +23,23 @@ export const END_POINTS = {
   play: () => '/api/playback',
 };
 
+/**
+ * Firebase Function Endpoints
+ */
+const fbBaseUrl = process.env.FIREBASE_FUNCTIONS_BASE_URL;
+
 export const FIREBASE_END_POINTS = {
-  addTopCounts: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/addTopCounts',
-  createSession: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/createSession',
-  joinSession: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/joinSession',
-  leaveSession: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/leaveSession',
-  endSession: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/endSession',
-  createPlaylist: () => 'https://us-central1-spotify-mixer-26da4.cloudfunctions.net/createPlaylist',
+  addTopCounts: () => `${fbBaseUrl}/addTopCounts`,
+  createSession: () => `${fbBaseUrl}/createSession`,
+  joinSession: () => `${fbBaseUrl}/joinSession`,
+  leaveSession: () => `${fbBaseUrl}/leaveSession`,
+  endSession: () => `${fbBaseUrl}/endSession`,
+  createPlaylist: () => `${fbBaseUrl}/createPlaylist`,
 };
 
+/**
+ * Spotify Web API Endpoints
+ */
 export const REDIRECT_URI = baseUrl + END_POINTS.getToken();
 export const SPOTIFY_STATE_KEY = 'spotify_auth_state';
 

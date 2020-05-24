@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "spotify-mixer-26da4"
+    "prod": "spotify-mixer-26da4",
+    "default": "spotify-mixer-dev"
   }
 }
