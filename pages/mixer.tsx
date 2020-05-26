@@ -37,12 +37,7 @@ const Mixer = () => {
 
     if (isPrimaryUser) {
       const createSessionEndpoint = END_POINTS.createSession();
-      const response = await fetch(createSessionEndpoint, {
-        method: 'POST',
-        body: JSON.stringify({
-          user: displayName,
-        }),
-      });
+      const response = await fetch(createSessionEndpoint, { method: 'POST' });
       const { sessionId } = await response.json();
 
       // We only set this so that it can be accessed to clean up

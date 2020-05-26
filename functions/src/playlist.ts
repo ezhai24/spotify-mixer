@@ -35,7 +35,7 @@ exports.addTopCounts = functions.https.onRequest(async (req, res) => {
     await admin.firestore()
       .collection('sessions').doc(sessionId)
       .update({
-        userCount: admin.firestore.FieldValue.increment(1),
+        users: admin.firestore.FieldValue.arrayUnion(user),
       });
 
     res.end();

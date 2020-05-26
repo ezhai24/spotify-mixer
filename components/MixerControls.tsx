@@ -103,8 +103,8 @@ const MixerControls = (props: Props) => {
     setupPlayer();
     
     firestore.collection('sessions').doc(sessionId).onSnapshot(snapshot => {
-      const { users, userCount } = snapshot.data() || {};
-      if (users && users.length !== sessionUsers.length && users.length === userCount) {
+      const { users } = snapshot.data() || {};
+      if (users && users.length !== sessionUsers.length) {
         setSessionUsers(users);
       };
     });

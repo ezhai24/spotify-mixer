@@ -5,15 +5,11 @@ const clientTools = require('firebase-tools');
 exports.createSession = functions.https.onRequest(async (req, res) => {
   const { method } = req;
   if (method === 'POST') {
-    const { body } = req;
-    const { user } = JSON.parse(body);
-
     // Create session
     const session = await admin.firestore()
       .collection('sessions')
       .add({
-        users: [user],
-        userCount: 0,
+        users: [],
       });
     
     // Create trackCounts subcollection with empty aggregate document
@@ -51,12 +47,6 @@ exports.joinSession = functions.https.onRequest(async (req, res) => {
         error: 'A user with this name has already joined this session',
       });
     }
-
-    await admin.firestore()
-      .collection('sessions').doc(sessionId)
-      .update({
-        users: admin.firestore.FieldValue.arrayUnion(user),
-      });
 
     res.end();
   }
@@ -98,7 +88,6 @@ exports.leaveSession = functions.https.onRequest(async (req, res) => {
       .collection('sessions').doc(sessionId)
       .update({
         users: admin.firestore.FieldValue.arrayRemove(displayName),
-        userCount: admin.firestore.FieldValue.increment(-1),
       });
 
     // Remove user's top counts document

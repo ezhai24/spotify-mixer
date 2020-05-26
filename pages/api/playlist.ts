@@ -16,7 +16,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const session = await firestore
       .collection('sessions').doc(sessionId as string)
       .get();
-    const userCount = session.get('userCount');
+    const userCount = session.get('users').length;
     const aggregate = await firestore
       .collection('sessions').doc(sessionId as string)
       .collection('topCounts').doc('aggregate')
