@@ -13,6 +13,7 @@ type PlaybackContextType = [
   PlaybackMap,
   React.Dispatch<React.SetStateAction<PlaybackMap>>,
 ];
+
 const PlaybackContext = createContext<PlaybackContextType>([undefined, () => {}]);
 
 export const usePlaybackService = (): {

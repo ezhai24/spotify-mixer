@@ -45,10 +45,10 @@ const About = () => {
       <h1>Spotify Mixer</h1>
       <h2>What is Spotify Mixer?</h2>
       <p>
-        You love music. Your friends love music. But it can be hard when your music tastes 
-        don't align. Or maybe they do align and you just want to discover more of what you 
-        love together. Whatever the case may be, Spotify Mixer can help. Spotify Mixer user 
-        you and your friends' music preferences to create unique playlists based on where 
+        You love music. Your friends love music. But it can be hard when what you love doesn't 
+        align. Or maybe it does align and you just want to discover more of what you love 
+        together. Whatever the case may be, Spotify Mixer can help. Spotify Mixer examines 
+        you and your friends' music preferences and creates unique playlists based on where 
         your tastes overlap.
       </p>
 
