@@ -29,7 +29,7 @@ The authorization flow follows standard OAuth 2.0 best practices for the most pa
 
 ### Database
 Spotify Mixer uses Google's Could Firestore on the backend to store session related data. Cloud Firestore is a NoSQL database, so there is no fixed schema. However, Spotify Mixer will create sessions with the following format:
-<img width="880" alt="Firebase schema" src="https://user-images.githubusercontent.com/15952697/82791581-dd791c80-9e22-11ea-8cc4-774fa3aae072.png">  
+<img width="877" alt="Screen Shot 2020-05-25 at 6 34 10 PM" src="https://user-images.githubusercontent.com/15952697/82851987-65f4cd00-9eb6-11ea-98bb-a9c87a48a465.png">  
 The user flow that constructs it goes like this:
 - When a session is created, a new document is added to the root `sessions` collection
 - Spotify Mixer makes a request to the Spotify API for that user's top 50 artists (of the last ~6 months)
